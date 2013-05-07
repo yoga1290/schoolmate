@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    
+
+    <EditText
+        android:id="@+id/audioPeer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/audioPeerOk"
+        android:layout_centerHorizontal="true"
+        android:ems="10" android:inputType="textAutoComplete">
+
+    </EditText>
+    <Button
+        android:id="@+id/audioPeerOk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="@string/button" />
+
+    <Button
+        android:id="@+id/stopbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/audioPeerOk"
+        android:layout_below="@+id/audioPeerOk"
+        android:layout_marginTop="26dp"
+        android:text="@string/stopbutton" />
+
+</RelativeLayout>

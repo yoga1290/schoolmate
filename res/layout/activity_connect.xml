@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <EditText
+        android:id="@+id/editText_pin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/et_connect"
+        android:layout_below="@+id/et_connect"
+        android:layout_marginTop="14dp"
+        android:ems="10"
+        android:inputType="textPassword" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/et_connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="14dp"
+        android:ems="10"
+        android:inputType="text"
+        android:text="Student ID" />
+
+    <Button
+        android:id="@+id/button_connect_google"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/editText_pin"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/connectgoogle" />
+
+    <Button
+        android:id="@+id/button_connectfb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/button_connect_google"
+        android:background="@drawable/connectfb" />
+
+    <Button
+        android:id="@+id/button_connect4sqr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/connect4sqr_small" />
+
+</RelativeLayout>
