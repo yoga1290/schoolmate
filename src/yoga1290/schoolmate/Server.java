@@ -198,8 +198,6 @@ class DataTransferThread extends Thread implements Runnable
 		{
 			ServerSocket ss = new ServerSocket(port);
             System.out.println("Waiting at port#"+port);
-            while(true)
-            {
 	            Socket s = ss.accept();
 	            System.out.println("LISTENing at port#"+port);
 	            InputStream in=s.getInputStream();
@@ -217,7 +215,6 @@ class DataTransferThread extends Thread implements Runnable
 					ServerData.send2Followers(buff,offset);
 				}
 				audioTrack.stop();
-            }
 //            ss.setReuseAddress(true);
 		}catch(Exception e){e.printStackTrace();}
 	}
