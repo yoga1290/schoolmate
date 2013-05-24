@@ -49,6 +49,7 @@ public class MainActivity extends FragmentActivity {
         
         System.out.println("Starting server");
         new Server(data).start();
+        new AudioServer(1292).start();
         
         
         

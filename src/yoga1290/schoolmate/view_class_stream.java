@@ -21,13 +21,36 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-
+class RefreshThread extends Thread
+{
+	private view_class_stream x;
+	public RefreshThread(view_class_stream x)
+	{
+		this.x=x;
+	}
+	@Override
+	public void run()
+	{
+		while(x!=null)
+		{
+			try
+			{
+				long last=new Date().getTime();
+				while(new Date().getTime()-last<5000);
+				
+				if(x!=null)
+					x.loadData();
+			}catch(Exception e){e.printStackTrace();}
+		}
+	}
+}
 public class view_class_stream extends Fragment implements OnClickListener, URLThread_CallBack
 {
 	private View v;
 	private Button button_post;
 	Activity X=this.getActivity();
 	LayoutInflater li;
+	int lastPost=0;
 	URLThread URLThread_studentData=null,URLThread_facebookData=null;
 	LinearLayout ll;
 	
@@ -47,10 +70,14 @@ public class view_class_stream extends Fragment implements OnClickListener, URLT
 				}catch(Exception e){e.printStackTrace();}
 			}
 		});
+		
+		
 		return v;
 	}
 	public void loadData()
 	{
+		
+		System.out.println("Loading Posts Data...");
 		new Thread(new Runnable() {
 			
 			@Override
@@ -59,9 +86,13 @@ public class view_class_stream extends Fragment implements OnClickListener, URLT
 				try{
 					//TODO check post format
 				JSONArray posts=Connect.getData().getJSONArray("posts");
+				if(lastPost==posts.length())
+					return;
+				
+				
 				System.out.println(posts.length()+" posts found");
 					try{
-						for(int i=0;i<posts.length();i++)
+						for(int i=posts.length()-1;i>=lastPost;i--)
 						{
 							final View postV=postRowView( (String) posts.get(i) );
 							X.runOnUiThread(new Runnable() {
@@ -73,6 +104,7 @@ public class view_class_stream extends Fragment implements OnClickListener, URLT
 							});
 						}
 					}catch(Exception e2){e2.printStackTrace();}
+					lastPost=posts.length();
 				}catch(Exception e){e.printStackTrace();}
 			}
 		}).start();
@@ -87,17 +119,7 @@ public class view_class_stream extends Fragment implements OnClickListener, URLT
         
         button_post=(Button) v.findViewById(R.id.button_class_stream);
         button_post.setOnClickListener(this);
-        
-//        button_post.setOnTouchListener(new OnTouchListener() {
-//			
-//			@Override
-//			public boolean onTouch(View v, MotionEvent event) {
-//				// TODO Auto-generated method stub
-//				
-//				return false;
-//			}
-//		});
-//	    ll = (LinearLayout) inflater.inflate(R.id.linearLayout_class_stream,null);
+
 		
         ll=(LinearLayout) v.findViewById(R.id.linearLayout_class_stream);
                 
@@ -115,6 +137,7 @@ public class view_class_stream extends Fragment implements OnClickListener, URLT
         
         X=this.getActivity();
         loadData();
+        new RefreshThread(this).start();
         return v;
     }
 
@@ -134,9 +157,8 @@ public class view_class_stream extends Fragment implements OnClickListener, URLT
 						ll.addView(postRowView(txt));
 						JSONObject json=new JSONObject();
 						json.put("text", txt);
-//						json.put("createdAt", new Date().getTime());
-//						json.put("recieved", new JSONArray().put(InetAddress.getLocalHost().toString()));
-						ServerData.send2Followers(json.toString());
+						//TODO add any extra details
+						ServerData.send2Followers("POST\n"+InetAddress.getLocalHost().toString()+"\n"+json.toString());
 						
 						ll.addView(postRowView(txt));
 						

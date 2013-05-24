@@ -45,13 +45,83 @@ class AudioProperties
 	public static final int bufferSizeIN = AudioRecord.getMinBufferSize(AudioProperties.sampleRateInHz,AudioProperties.channelConfigIN,AudioProperties.audioFormat);
 	public static final int bufferSizeOUT = AudioRecord.getMinBufferSize(AudioProperties.sampleRateInHz,AudioProperties.channelConfigOUT,AudioProperties.audioFormat);
 }
+
+//not yet used
+class AudioServer extends Thread
+{
+	
+	public int PORT;
+	private ServerSocket ss;
+	
+	public AudioServer(int port)
+	{
+		this.PORT=port;
+	}
+	@Override
+	public void run()
+	{
+		try{
+			ss=new ServerSocket(PORT);//(InetAddress.getByAddress(new byte[]{(byte)255,(byte)255,(byte)255,(byte)255}) , PORT);
+			while(true)
+			{
+				 	Socket s = ss.accept();
+				 	if(!s.getLocalAddress().equals(InetAddress.getLocalHost()))
+				 		new AudioTrackThread(ss.accept()).start();
+//				 	byte buff[]=new byte[AudioProperties.bufferSizeOUT];
+//				 	AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 
+//							AudioProperties.sampleRateInHz,//44100,//11025, 
+//							AudioProperties.channelConfigOUT,//AudioFormat.CHANNEL_IN_STEREO,//AudioFormat.CHANNEL_CONFIGURATION_MONO,
+//							AudioProperties.audioFormat,//AudioFormat.ENCODING_PCM_16BIT,//AudioFormat.ENCODING_PCM_16BIT, 
+//							AudioProperties.bufferSizeOUT,// 
+//							AudioTrack.MODE_STREAM);
+//				 	
+//				 	
+//		            InputStream in=s.getInputStream();
+//					audioTrack.play();
+//					int offset=0;
+//					
+//					while((offset=in.read(buff))>0)
+//						audioTrack.write(buff, 0, offset);
+//					audioTrack.stop();
+			}
+		}catch(Exception e){e.printStackTrace();}
+	}
+}
+class AudioTrackThread extends Thread
+{
+	public Socket s;
+	public AudioTrackThread(Socket s)
+	{
+		this.s=s;
+	}
+	public void run() {
+		try{
+			byte buff[]=new byte[AudioProperties.bufferSizeOUT];
+		 	AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 
+					AudioProperties.sampleRateInHz,//44100,//11025, 
+					AudioProperties.channelConfigOUT,//AudioFormat.CHANNEL_IN_STEREO,//AudioFormat.CHANNEL_CONFIGURATION_MONO,
+					AudioProperties.audioFormat,//AudioFormat.ENCODING_PCM_16BIT,//AudioFormat.ENCODING_PCM_16BIT, 
+					AudioProperties.bufferSizeOUT,// 
+					AudioTrack.MODE_STREAM);
+		 	
+		 	
+            InputStream in=s.getInputStream();
+			audioTrack.play();
+			int offset=0;
+			
+			while((offset=in.read(buff))>0)
+				audioTrack.write(buff, 0, offset);
+			audioTrack.stop();
+		}catch(Exception e){e.printStackTrace();}
+	}
+}
 class ServerData // implements Parcelable
 {
 	public static LinkedList<String> followers=new LinkedList<String>();
-	public static LinkedList<String> stream=new LinkedList<String>();
+//	public static LinkedList<String> stream=new LinkedList<String>();
 	public static TreeMap<String,Integer> preReservedPort=new TreeMap<String, Integer>();
 	public static TreeMap<String,DataTransferThread> dataThread=new TreeMap<String, DataTransferThread>();
-	public static String following="";
+//	public static String following="";
 	
 	public boolean isFree2Listen=true;
 	public byte buff[];
@@ -61,6 +131,22 @@ class ServerData // implements Parcelable
 	public static void addClient(String IP)
 	{
 		followers.add(IP);
+	}
+	public static void broadcast(final byte data[],final int offset,final int port)
+	{
+		new Thread(new Runnable() {
+			@Override
+			public void run() 
+			{
+				try
+				{
+					Socket s=new Socket(InetAddress.getByAddress(new byte[]{(byte)0,(byte)0,(byte)0,(byte)0}) , port);
+					s.getOutputStream().write(data,0,offset);
+					s.close();
+				}catch(Exception e){e.printStackTrace();}
+				
+			}
+		}).start();
 	}
 	public static void send2Followers(final byte data[],final int offset)
 	{
@@ -198,6 +284,8 @@ class DataTransferThread extends Thread implements Runnable
 		{
 			ServerSocket ss = new ServerSocket(port);
             System.out.println("Waiting at port#"+port);
+//            while(true)
+//            {
 	            Socket s = ss.accept();
 	            System.out.println("LISTENing at port#"+port);
 	            InputStream in=s.getInputStream();
@@ -215,6 +303,7 @@ class DataTransferThread extends Thread implements Runnable
 					ServerData.send2Followers(buff,offset);
 				}
 				audioTrack.stop();
+//            }
 //            ss.setReuseAddress(true);
 		}catch(Exception e){e.printStackTrace();}
 	}
@@ -267,41 +356,43 @@ class ServerRequestHandler extends Thread implements Runnable
 //            }
             PrintWriter out=new PrintWriter(s.getOutputStream());
             
+            //new stream post?
             if(CMD.equals("POST"))
             {
-				
-            		String txt="",tmp;
+            		String txt="",tmp,senderIP;
             		System.out.println("POST");
-            		while((tmp=in.readLine())!=null)
-            			txt+=tmp;
-            		ServerData.stream.add(txt); 
-            		System.out.println(txt);
-            		//TODO serverdata send to all excepted "recieved" list
-            		
-            		try{
-            			JSONObject x=Connect.getData();
-            			x.getJSONArray("posts").put(txt);
-            			Connect.setData(x);
-            		}catch(Exception e)
+            		senderIP=in.readLine();
+            		if(senderIP.equals(s.getLocalAddress().toString()))
             		{
-            			JSONObject x=Connect.getData().put("posts", new JSONArray().put(txt));
-            			Connect.setData(x);
+            			in.close();
+            			s.close();
             		}
-            		ServerData.send2Followers(txt);
+            		else
+            		{
+	            		while((tmp=in.readLine())!=null)
+	            			txt+=tmp;
+	            		System.out.println(txt);
+	            		try{
+	            			JSONObject x=Connect.getData();
+	            			x.getJSONArray("posts").put(txt);
+	            			Connect.setData(x);
+	            		}catch(Exception e)
+	            		{
+	            			JSONObject x=Connect.getData().put("posts", new JSONArray().put(txt));
+	            			Connect.setData(x);
+	            		}
+	            		ServerData.send2Followers("POST\n"+s.getInetAddress().toString()+"\n"+txt);
+            		}
             }
             else if(CMD.indexOf("LISTEN")>-1)
             {
-            		long pckTime=new Long(CMD.split(" ")[1]);
-//            		if(pckTime<=ServerData.lastPckTime)
-//            		{
-//            			out.println("NO");
-//            			out.flush();
-//            		}
-//            		else
-//            		{
-//            			ServerData.lastPckTime=new Date().getTime();
-//	            		System.out.println("LISTEN request...");
-//					for(ServerData.lastUsedPort++; isPortAvailable(ServerData.lastUsedPort)==false;ServerData.lastUsedPort++);//port<65535 &&
+
+            		if(in.readLine().equals(s.getLocalAddress().toString()))
+            		{
+            			in.close();
+            		}
+            		else
+            		{
 //	            		int port=1291;
 //	            		for(;!isPortAvailable(port);port++);
 	            		int port=1291;
@@ -331,7 +422,7 @@ class ServerRequestHandler extends Thread implements Runnable
 					
 					System.out.println("YES "+port);
 					out.flush();
-//            		}
+            		}
             }
             //localhost:1290/foursquare?access_token=AAAAAAA
             else if(CMD.indexOf("?access_token=")>-1)
