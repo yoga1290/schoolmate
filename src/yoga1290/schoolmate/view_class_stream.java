@@ -35,11 +35,10 @@ class RefreshThread extends Thread
 		{
 			try
 			{
-				long last=new Date().getTime();
-				while(new Date().getTime()-last<5000);
-				
 				if(x!=null)
 					x.loadData();
+				long last=new Date().getTime();
+				while(new Date().getTime()-last<5000);
 			}catch(Exception e){e.printStackTrace();}
 		}
 	}
@@ -157,8 +156,8 @@ public class view_class_stream extends Fragment implements OnClickListener, URLT
 						ll.addView(postRowView(txt));
 						JSONObject json=new JSONObject();
 						json.put("text", txt);
-						//TODO add any extra details
-						ServerData.send2Followers("POST\n"+InetAddress.getLocalHost().toString()+"\n"+json.toString());
+						//TODO IP fix
+						ServerData.send2Followers(json.toString());
 						
 						ll.addView(postRowView(txt));
 						

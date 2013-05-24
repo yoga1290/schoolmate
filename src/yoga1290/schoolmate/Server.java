@@ -233,7 +233,50 @@ class ServerData // implements Parcelable
 						Socket s=new Socket(InetAddress.getByAddress(ip) , ServerProperties.port);
 					
 						PrintWriter out=new PrintWriter(s.getOutputStream());
-						out.println("POST\n");//CMD
+						out.println("POST\n"+s.getLocalAddress().toString()+"\n");//CMD
+						
+						out.println(JSON);
+			            out.flush();
+//			            out.close();
+//			            System.out.println("waiting for response b4 data...");
+
+			            out.close();
+			            s.close();
+					}catch(Exception e){e.printStackTrace();}
+					
+				}
+			}).start();
+		}
+	}
+	public static void send2Followers(final String senderIP,final String JSON)
+	{
+		final Iterator<String> it=followers.iterator();
+		while(it.hasNext())
+		{
+			final String follower=it.next();
+			new Thread(new Runnable() {
+				
+				@Override
+				public void run() 
+				{
+					try
+					{
+						int p=0,o;
+						byte ip[]=new byte[4];
+						String cur=follower;
+						while(p<4 && (o=cur.indexOf("."))>-1)
+						{
+							ip[p++]=(byte) Integer.parseInt(cur.substring(0,o));
+							cur=cur.substring(o+1);
+						}
+						ip[3]=(byte) Integer.parseInt(cur);
+						System.out.println("Connecting to "+follower);
+						
+						
+						Socket s=new Socket(InetAddress.getByAddress(ip) , ServerProperties.port);
+					
+						PrintWriter out=new PrintWriter(s.getOutputStream());
+						out.println("POST\n"+senderIP+"\n");//CMD
 						
 						out.println(JSON);
 			            out.flush();
@@ -362,6 +405,9 @@ class ServerRequestHandler extends Thread implements Runnable
             		String txt="",tmp,senderIP;
             		System.out.println("POST");
             		senderIP=in.readLine();
+            		System.out.println("from IP:"+senderIP);
+            		System.out.println("Local IP:"+s.getLocalAddress().toString());
+            		System.out.println("Remote IP:"+s.getInetAddress().toString());
             		if(senderIP.equals(s.getLocalAddress().toString()))
             		{
             			in.close();
@@ -381,7 +427,7 @@ class ServerRequestHandler extends Thread implements Runnable
 	            			JSONObject x=Connect.getData().put("posts", new JSONArray().put(txt));
 	            			Connect.setData(x);
 	            		}
-	            		ServerData.send2Followers("POST\n"+s.getInetAddress().toString()+"\n"+txt);
+	            		ServerData.send2Followers(senderIP,txt);
             		}
             }
             else if(CMD.indexOf("LISTEN")>-1)
