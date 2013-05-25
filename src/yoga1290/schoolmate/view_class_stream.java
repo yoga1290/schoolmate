@@ -152,8 +152,6 @@ public class view_class_stream extends Fragment implements OnClickListener, URLT
 				public void run()
 				{
 					try{
-
-						ll.addView(postRowView(txt));
 						JSONObject json=new JSONObject();
 						json.put("text", txt);
 						//TODO IP fix

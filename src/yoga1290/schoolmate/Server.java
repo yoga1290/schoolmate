@@ -13,6 +13,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeMap;
@@ -136,7 +137,7 @@ class ServerData // implements Parcelable
 	{
 		new Thread(new Runnable() {
 			@Override
-			public void run() 
+			public void run()
 			{
 				try
 				{
@@ -154,6 +155,71 @@ class ServerData // implements Parcelable
 		while(it.hasNext())
 		{
 			final String follower=it.next();
+			new Thread(new Runnable() {
+				
+				@Override
+				public void run() 
+				{
+					try
+					{
+						int p=0,o;
+						byte ip[]=new byte[4];
+						String cur=follower;
+						while(p<4 && (o=cur.indexOf("."))>-1)
+						{
+							ip[p++]=(byte) Integer.parseInt(cur.substring(0,o));
+							cur=cur.substring(o+1);
+						}
+						ip[3]=(byte) Integer.parseInt(cur);
+						System.out.println("Connecting to "+follower);
+						
+						
+						Socket s=new Socket(InetAddress.getByAddress(ip) , ServerProperties.port);
+					
+						PrintWriter out=new PrintWriter(s.getOutputStream());
+			            out.println("LISTEN "+new Date().getTime());
+			            out.flush();
+//			            out.close();
+			            System.out.println("waiting for response b4 data...");
+			            BufferedReader in=new BufferedReader(new InputStreamReader(s.getInputStream()));
+			            String resp=in.readLine();
+			            if(resp.equals("NO"))	return;
+			            //TODO FIX; connection timeouts here but why?!!
+			            
+			            System.out.println(s.getInetAddress()+" response: "+resp);
+			            out.close();
+			            in.close();
+			            s.close();
+						
+						Socket s2=new Socket(InetAddress.getByAddress(ip) , 
+										Integer.parseInt(resp.split(" ")[1])	);
+						s2.getOutputStream().write(data,0,offset);
+						s2.close();
+						
+//						out.close();
+//			            in.close();
+//			            s.close();
+					}catch(Exception e){e.printStackTrace();}
+					
+				}
+			}).start();
+		}
+	}
+	public static void send2Followers(final String senders,final byte data[],final int offset)
+	{
+		
+		HashSet<String> visitedIP=new HashSet<String>();
+		String ips[]=senders.split(",");
+		for(int i=0;i<ips.length;i++)
+			visitedIP.add(ips[i]);
+		
+		final Iterator<String> it=followers.iterator();
+		while(it.hasNext())
+		{
+			final String follower=it.next();
+			
+			if(visitedIP.contains(follower))		continue;
+			
 			new Thread(new Runnable() {
 				
 				@Override
@@ -248,12 +314,23 @@ class ServerData // implements Parcelable
 			}).start();
 		}
 	}
-	public static void send2Followers(final String senderIP,final String JSON)
+	
+	//SenderIPs, including yours
+	public static void send2Followers(final String senderIPs,final String JSON)
 	{
 		final Iterator<String> it=followers.iterator();
+		HashSet<String> visitedIP=new HashSet<String>();
+		String ips[]=senderIPs.split(",");
+		for(int i=0;i<ips.length;i++)
+			visitedIP.add(ips[i]);
+		
 		while(it.hasNext())
 		{
 			final String follower=it.next();
+			
+			if(visitedIP.contains(follower))
+				continue;
+			
 			new Thread(new Runnable() {
 				
 				@Override
@@ -263,7 +340,10 @@ class ServerData // implements Parcelable
 					{
 						int p=0,o;
 						byte ip[]=new byte[4];
+						
+						
 						String cur=follower;
+						
 						while(p<4 && (o=cur.indexOf("."))>-1)
 						{
 							ip[p++]=(byte) Integer.parseInt(cur.substring(0,o));
@@ -276,7 +356,7 @@ class ServerData // implements Parcelable
 						Socket s=new Socket(InetAddress.getByAddress(ip) , ServerProperties.port);
 					
 						PrintWriter out=new PrintWriter(s.getOutputStream());
-						out.println("POST\n"+senderIP+"\n");//CMD
+						out.println("POST\n"+senderIPs+"\n");//CMD
 						
 						out.println(JSON);
 			            out.flush();
