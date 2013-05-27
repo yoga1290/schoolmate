@@ -141,7 +141,8 @@ private void writeAudioDataToFile(){
                         
                         
                         if(AudioRecord.ERROR_INVALID_OPERATION != read){
-                        		ServerData.send2Followers(data,read);
+                        		ServerData.send2Followers("",data,read);
+                        		
 //                        	ServerData.broadcast(data,read, 1292);
                         		
 //                                try {

@@ -61,17 +61,26 @@ public class view_profile extends Fragment implements URLThread_CallBack
 		{
 			if(URLThread_studentData!=null)
 			{
-				JSONObject json=new JSONObject(response);
-				Iterator<String> K=json.keys();
-				String curKey="";
-				LinearLayout ll=(LinearLayout) v.findViewById(R.id.linearLayout_profile_info);
-				while(K.hasNext())
-				{
-					curKey=K.next();
-					TextView tv=new TextView(this.getActivity());
-					tv.setText((curKey)+" : "+json.getString(curKey));
-					ll.addView(tv);
-				}
+				final JSONObject json=new JSONObject(response);
+				this.getActivity().runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						try{
+							Iterator<String> K=json.keys();
+							String curKey="";
+							LinearLayout ll=(LinearLayout) v.findViewById(R.id.linearLayout_profile_info);
+							while(K.hasNext())
+							{
+								curKey=K.next();
+								
+								TextView tv=new TextView(v.getContext());
+								tv.setText((curKey)+" : "+json.getString(curKey));
+								ll.addView(tv);
+							}
+						}catch(Exception e){e.printStackTrace();}
+					}
+				});
 				//TODO
 				String fbid="870205250";
 				URLThread_facebookData=new URLThread("https://graph.facebook.com/"+fbid+"?fields=picture&access_token="+Connect.OAuthFacebook_AppAccessToken,this, "");

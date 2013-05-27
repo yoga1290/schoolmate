@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -183,7 +184,11 @@ class ServerData // implements Parcelable
 			            System.out.println("waiting for response b4 data...");
 			            BufferedReader in=new BufferedReader(new InputStreamReader(s.getInputStream()));
 			            String resp=in.readLine();
-			            if(resp.equals("NO"))	return;
+			            if(resp.equals("NO"))
+			            {
+			            		s.close();
+			            		return;
+			            }
 			            //TODO FIX; connection timeouts here but why?!!
 			            
 			            System.out.println(s.getInetAddress()+" response: "+resp);
@@ -205,6 +210,8 @@ class ServerData // implements Parcelable
 			}).start();
 		}
 	}
+	
+	//senders: received clients other than me
 	public static void send2Followers(final String senders,final byte data[],final int offset)
 	{
 		
@@ -242,13 +249,18 @@ class ServerData // implements Parcelable
 						Socket s=new Socket(InetAddress.getByAddress(ip) , ServerProperties.port);
 					
 						PrintWriter out=new PrintWriter(s.getOutputStream());
-			            out.println("LISTEN "+new Date().getTime());
+			            out.println("LISTEN");
+			            out.println(senders+","+s.getLocalAddress().toString());
 			            out.flush();
 //			            out.close();
 			            System.out.println("waiting for response b4 data...");
 			            BufferedReader in=new BufferedReader(new InputStreamReader(s.getInputStream()));
 			            String resp=in.readLine();
-			            if(resp.equals("NO"))	return;
+			            if(resp.equals("NO"))
+			            	{
+			            		s.close();
+			            		return;
+			            	}
 			            //TODO FIX; connection timeouts here but why?!!
 			            
 			            System.out.println(s.getInetAddress()+" response: "+resp);
@@ -389,9 +401,23 @@ class DataTransferThread extends Thread implements Runnable
 	private byte buff[];
 	private AudioTrack audioTrack;
 	private ServerSocket ss;
+	
+	private String senders="";
 	public DataTransferThread(int port)//,ServerData data)
 	{
 		this.port=port;
+		this.buff=new byte[AudioProperties.bufferSizeOUT];
+		this.audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 
+				AudioProperties.sampleRateInHz,//44100,//11025, 
+				AudioProperties.channelConfigOUT,//AudioFormat.CHANNEL_IN_STEREO,//AudioFormat.CHANNEL_CONFIGURATION_MONO,
+				AudioProperties.audioFormat,//AudioFormat.ENCODING_PCM_16BIT,//AudioFormat.ENCODING_PCM_16BIT, 
+				AudioProperties.bufferSizeOUT,// 
+				AudioTrack.MODE_STREAM);
+	}
+	public DataTransferThread(int port,String senders)
+	{
+		this.port=port;
+		this.senders=senders;
 		this.buff=new byte[AudioProperties.bufferSizeOUT];
 		this.audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 
 				AudioProperties.sampleRateInHz,//44100,//11025, 
@@ -423,7 +449,8 @@ class DataTransferThread extends Thread implements Runnable
 					// Write the music buffer to the AudioTrack object
 					audioTrack.write(buff, 0, offset);
 					//Pass what you hear to your followers
-					ServerData.send2Followers(buff,offset);
+//					ServerData.send2Followers(buff,offset);
+					ServerData.send2Followers(senders,buff,offset);
 				}
 				audioTrack.stop();
 //            }
@@ -510,46 +537,78 @@ class ServerRequestHandler extends Thread implements Runnable
 	            		ServerData.send2Followers(senderIP,txt);
             		}
             }
-            else if(CMD.indexOf("LISTEN")>-1)
+            else if(CMD.equals("LISTEN"))
             {
-
-            		if(in.readLine().equals(s.getLocalAddress().toString()))
+            		HashSet<String> receivedIPs=new HashSet<String>();
+            		String sendersln=in.readLine();
+            		String senders[]=sendersln.split(",");
+            		for(int i=0;i<senders.length;i++)
+            			receivedIPs.add(senders[i]);
+            		
+            		if(receivedIPs.contains(s.getLocalAddress()))
             		{
-            			in.close();
+            			System.out.println("DUPLICATION ignored from:"+sendersln);
+            			s.close();
+            			return;
             		}
-            		else
-            		{
-//	            		int port=1291;
-//	            		for(;!isPortAvailable(port);port++);
-	            		int port=1291;
-	            		
-	            		
-	            		if(ServerData.preReservedPort.containsKey(s.getInetAddress().toString()))
-	            			port=ServerData.preReservedPort.get(s.getInetAddress().toString());
-	            		else
-	            		{
-	            			for(port=1291;!isPortAvailable(port);port++);
-	            			ServerData.preReservedPort.put(s.getInetAddress().toString(),port);
-	            			ServerData.dataThread.put(s.getInetAddress().toString(), new DataTransferThread(port));
-	            		}
-					
-	            		
-	            		System.out.println("New LISTEN port at "+port);
-	            		System.out.println("New LISTEN from "+s.getInetAddress().toString());
-					//TODO LISTEN & pass it to everyone
-	            		out.println("YES "+port);
-//					ServerData.dataThread.get(s.getInetAddress().toString()).start();
-	            		
-//					ServerData.dataThread.get(s.getInetAddress().toString()).start();
-					
-					
-					
-					new DataTransferThread(port).start();	
-					
-					System.out.println("YES "+port);
-					out.flush();
-            		}
+            		
+            		
+	            	int port=1291;
+	            	if(ServerData.preReservedPort.containsKey(s.getInetAddress().toString()))
+	            		port=ServerData.preReservedPort.get(s.getInetAddress().toString());
+	            	else
+	            	{
+	            		for(port=1291;!isPortAvailable(port);port++);
+	            		ServerData.preReservedPort.put(s.getInetAddress().toString(),port);
+//	            		ServerData.dataThread.put(s.getInetAddress().toString(), new DataTransferThread(port));
+	            	}
+				System.out.println("New LISTEN port at "+port);
+	            	System.out.println("New LISTEN from "+s.getInetAddress().toString());
+	            	out.println("YES "+port);
+				new DataTransferThread(port,sendersln).start();
+				System.out.println("YES "+port);
+				out.flush();
             }
+//            else if(CMD.indexOf("LISTEN")>-1)
+//            {
+//
+//            		if(in.readLine().equals(s.getLocalAddress().toString()))
+//            		{
+//            			in.close();
+//            		}
+//            		else
+//            		{
+////	            		int port=1291;
+////	            		for(;!isPortAvailable(port);port++);
+//	            		int port=1291;
+//	            		
+//	            		
+//	            		if(ServerData.preReservedPort.containsKey(s.getInetAddress().toString()))
+//	            			port=ServerData.preReservedPort.get(s.getInetAddress().toString());
+//	            		else
+//	            		{
+//	            			for(port=1291;!isPortAvailable(port);port++);
+//	            			ServerData.preReservedPort.put(s.getInetAddress().toString(),port);
+//	            			ServerData.dataThread.put(s.getInetAddress().toString(), new DataTransferThread(port));
+//	            		}
+//					
+//	            		
+//	            		System.out.println("New LISTEN port at "+port);
+//	            		System.out.println("New LISTEN from "+s.getInetAddress().toString());
+//					//TODO LISTEN & pass it to everyone
+//	            		out.println("YES "+port);
+////					ServerData.dataThread.get(s.getInetAddress().toString()).start();
+//	            		
+////					ServerData.dataThread.get(s.getInetAddress().toString()).start();
+//					
+//					
+//					
+//					new DataTransferThread(port).start();	
+//					
+//					System.out.println("YES "+port);
+//					out.flush();
+//            		}
+//            }
             //localhost:1290/foursquare?access_token=AAAAAAA
             else if(CMD.indexOf("?access_token=")>-1)
             {
