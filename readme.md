@@ -1,4 +1,4 @@
->	May link text to source files later!
+>	On going/Incomplete yet,May add features & link text to source files ;)
 
 # Authorizing:
 
@@ -22,6 +22,7 @@ Actually, there are still some problems here… 1st time I used to loop for an a
 +	Sure,don't send anything back to someone mentioned the POST header!
 ![avoiding duplicates](readme/duplication.png)
 
+Implemented in the following functions: [Server/ServerRequestHandler.run](src/yoga1290/schoolmate/Server.java) & [Server/ServerData.send2Followers](src/yoga1290/schoolmate/Server.java).
 
 # Data Visualization
 ![Visualization](readme/readme3.png)
