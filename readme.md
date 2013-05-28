@@ -18,9 +18,9 @@ Actually, there are still some problems here… 1st time I used to loop for an a
 
 ## Avoiding duplicates:
 
-	+ don't send anything back
-	+ ignore posts coming from 2 or more friends/followers
-	![avoiding duplicates](readme/duplication.png)
++	don't send anything back
++	ignore posts coming from 2 or more friends/followers
+![avoiding duplicates](readme/duplication.png)
 
 
 # Data Visualization
