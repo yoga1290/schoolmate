@@ -524,18 +524,14 @@ class ServerRequestHandler extends Thread implements Runnable
             		for(i=0;i<senders.length;i++)
             			receivedIPs.add(senders[i]);
             		Iterator<String> it_friends=ServerData.followers.iterator();
-            		boolean includingFollowers=false;
+            		String cur;
+            		//include the people you'll notify, so no one will notify them later!
             		while(it_friends.hasNext())
-            			if(receivedIPs.contains(it_friends.next()))
-            			{
-            				if(includingFollowers) //not the 1st follower passing it
-            				{
-            					s.close();
-                    			return;
-            				}
-            				includingFollowers=true;
-            			}
-            		
+            		{
+            			cur=it_friends.next();
+            			if(!receivedIPs.contains(cur))
+            				sendersln+=","+cur;
+            		}
             		
 	            		while((tmp=in.readLine())!=null)
 	            			txt+=tmp;
@@ -561,17 +557,14 @@ class ServerRequestHandler extends Thread implements Runnable
             		for(i=0;i<senders.length;i++)
             			receivedIPs.add(senders[i]);
             		Iterator<String> it_friends=ServerData.followers.iterator();
-            		boolean includingFollowers=false;
+            		String cur;
+            		//include the people you'll notify, so no one will notify them later!
             		while(it_friends.hasNext())
-            			if(receivedIPs.contains(it_friends.next()))
-            			{
-            				if(includingFollowers) //not the 1st follower passing it
-            				{
-            					s.close();
-                    			return;
-            				}
-            				includingFollowers=true;
-            			}
+            		{
+            			cur=it_friends.next();
+            			if(!receivedIPs.contains(cur))
+            				sendersln+=","+cur;
+            		}
             		
             		
             		System.out.println("My Address: "+s.getLocalAddress());

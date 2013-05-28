@@ -18,9 +18,8 @@ Actually, there are still some problems here… 1st time I used to loop for an a
 
 ## Avoiding duplicates:
 
-+	don't send anything back
-+	ignore posts coming from 2 or more friends/followers
-+	SOMETHING IS STILL MISSING
++	include your other friends/followers in the POST header .:. no1 else notify them!
++	Sure,don't send anything back to someone mentioned the POST header!
 ![avoiding duplicates](readme/duplication.png)
 
 
