@@ -20,6 +20,7 @@ Actually, there are still some problems here… 1st time I used to loop for an a
 
 +	don't send anything back
 +	ignore posts coming from 2 or more friends/followers
++	SOMETHING IS STILL MISSING
 ![avoiding duplicates](readme/duplication.png)
 
 
