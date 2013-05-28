@@ -37,7 +37,10 @@ public class Connect
 	}
 	public static String OAuthFacebookURI="https://www.facebook.com/dialog/oauth?client_id=122683301250532&redirect_uri=http://yoga1290.appspot.com/schoolmate/oauth/facebook/callback/&scope=user_about_me,email,user_education_history&state=signup";
 	public static String OAuthFoursquareURI="https://foursquare.com/oauth2/authenticate?client_id=BZ4QPVWSF213QA2ICE1QSHIGDMCNZBW20QD3EXBVH0OHG3IT&response_type=code&redirect_uri=http://yoga1290.appspot.com/schoolmate/oauth/foursquare/callback/";
-	public static String OAuthFacebook_AppAccessToken="********";
+	
+	// get AppAccessToken from https://graph.facebook.com/oauth/access_token?client_id=122683301250532&client_secret=***&grant_type=client_credentials
+	public static String OAuthFacebook_AppAccessToken="***";
+	
 	//Const:
 	public static String facebook="facebook";
 	public static String foursquare="foursquare";

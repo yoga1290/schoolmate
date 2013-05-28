@@ -39,17 +39,28 @@ public class view_profile extends Fragment implements URLThread_CallBack
         
         
         //Testing
-		String fbid="870205250";
+		String fbid="870205250";	
 //		if(URLThread_facebookData==null)
 //		{
-			URLThread_facebookData=new URLThread("https://graph.facebook.com/"+fbid+"?fields=picture&access_token="+Connect.OAuthFacebook_AppAccessToken,this, "");
-			URLThread_facebookData.start();
+//			URLThread_facebookData=new URLThread("https://graph.facebook.com/"+fbid+"?fields=picture&access_token="+Connect.OAuthFacebook_AppAccessToken,this, "");
+//			URLThread_facebookData.start();
 //		}
+			
+			URLThread_studentData=new URLThread("http://yoga1290.appspot.com/schoolmate/student?id=1", this, "");
+			URLThread_studentData.start();
         return v;
     }
-
+	private View getRowView(String txt)
+	{
+		LayoutInflater li = (LayoutInflater) this.getActivity().getSystemService(this.getActivity().LAYOUT_INFLATER_SERVICE);
+		View v=li.inflate(R.layout.view_post_row, null);
+		//TODO listeners
+		((TextView) v.findViewById(R.id.textView_post_row)).setText(txt);
+		return v;
+	}
 	public void getDataFrom(String uri)
 	{
+		//TODO Connect.getData().getString("")
 		URLThread_studentData=new URLThread(uri, this, "");
 		URLThread_studentData.start();
 	}
@@ -57,40 +68,52 @@ public class view_profile extends Fragment implements URLThread_CallBack
 	@Override
 	public void URLCallBack(String response)
 	{
+		final view_profile X=this;
+		final String resp=response;
 		try
 		{
 			if(URLThread_studentData!=null)
 			{
-				final JSONObject json=new JSONObject(response);
 				this.getActivity().runOnUiThread(new Runnable() {
 					
 					@Override
 					public void run() {
-						try{
-							Iterator<String> K=json.keys();
-							String curKey="";
-							LinearLayout ll=(LinearLayout) v.findViewById(R.id.linearLayout_profile_info);
-							while(K.hasNext())
-							{
-								curKey=K.next();
-								
-								TextView tv=new TextView(v.getContext());
-								tv.setText((curKey)+" : "+json.getString(curKey));
-								ll.addView(tv);
-							}
-						}catch(Exception e){e.printStackTrace();}
+						// TODO Auto-generated method stub
+						((LinearLayout) X.v.findViewById(R.id.linearLayout_profile_info)).addView(getRowView("HELLO!"));
 					}
 				});
+//				X.getActivity().runOnUiThread(new Runnable() {
+//					@Override
+//				public void run() {
+//					try{
+//						JSONObject json=new JSONObject(resp);
+//						Iterator<String> K=json.keys();
+//						while(K.hasNext())
+//						{
+//							String curKey=K.next();
+//							System.out.println(curKey+":");
+//							final View row=getRowView(curKey);
+//							
+//												((LinearLayout) X.v.findViewById(R.id.linearLayout_profile_info)).addView(row);
+//		//										System.out.println(json.getString(curKey));
+//		//									}catch(Exception e){e.printStackTrace();}	
+//									}
+//					}catch(Exception e){e.printStackTrace();}
+//				}
+//				});
+					
+//				}
 				//TODO
-				String fbid="870205250";
+				String fbid="870205250";// Connect.getData().getString("fbid");
 				URLThread_facebookData=new URLThread("https://graph.facebook.com/"+fbid+"?fields=picture&access_token="+Connect.OAuthFacebook_AppAccessToken,this, "");
 				URLThread_facebookData.start();
+				URLThread_studentData=null;
 			}
 			if(URLThread_facebookData!=null)
 			{
 				JSONObject json=new JSONObject(response);
 				final String ppURL=json.getJSONObject("picture").getJSONObject("data").getString("url");
-				final view_profile X=this;
+				
 				
 				new Thread(new Runnable() {
 					@Override
@@ -105,7 +128,7 @@ public class view_profile extends Fragment implements URLThread_CallBack
 					}
 				}).start();
 				
-				
+				URLThread_facebookData=null;
 			}
 		}catch(Exception e){e.printStackTrace();}
 		

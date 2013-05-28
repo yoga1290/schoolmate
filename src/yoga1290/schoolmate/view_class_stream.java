@@ -232,9 +232,7 @@ public class view_class_stream extends Fragment implements OnClickListener, OnTo
 	}
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
-	{
-		System.out.println("Touch Event: "+event.getAction());
-		
+	{		
 		if (MotionEvent.ACTION_DOWN == event.getAction())
 		{
 			
