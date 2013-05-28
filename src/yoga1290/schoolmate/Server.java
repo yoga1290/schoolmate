@@ -340,6 +340,7 @@ class ServerData // implements Parcelable
 		{
 			final String follower=it.next();
 			
+			//don't send it back!
 			if(visitedIP.contains(follower))
 				continue;
 			
@@ -513,17 +514,29 @@ class ServerRequestHandler extends Thread implements Runnable
             {
             		String txt="",tmp,senderIP;
             		System.out.println("POST");
-            		senderIP=in.readLine();
-            		System.out.println("from IP:"+senderIP);
-            		System.out.println("Local IP:"+s.getLocalAddress().toString());
-            		System.out.println("Remote IP:"+s.getInetAddress().toString());
-            		if(senderIP.equals(s.getLocalAddress().toString()))
-            		{
-            			in.close();
-            			s.close();
-            		}
-            		else
-            		{
+//            		System.out.println("from IP:"+senderIP);
+//            		System.out.println("Local IP:"+s.getLocalAddress().toString());
+//            		System.out.println("Remote IP:"+s.getInetAddress().toString());
+            		HashSet<String> receivedIPs=new HashSet<String>();
+            		String sendersln=in.readLine();
+            		String senders[]=sendersln.split(",");
+            		int i;
+            		for(i=0;i<senders.length;i++)
+            			receivedIPs.add(senders[i]);
+            		Iterator<String> it_friends=ServerData.followers.iterator();
+            		boolean includingFollowers=false;
+            		while(it_friends.hasNext())
+            			if(receivedIPs.contains(it_friends.next()))
+            			{
+            				if(includingFollowers) //not the 1st follower passing it
+            				{
+            					s.close();
+                    			return;
+            				}
+            				includingFollowers=true;
+            			}
+            		
+            		
 	            		while((tmp=in.readLine())!=null)
 	            			txt+=tmp;
 	            		System.out.println(txt);
@@ -536,19 +549,35 @@ class ServerRequestHandler extends Thread implements Runnable
 	            			JSONObject x=Connect.getData().put("posts", new JSONArray().put(txt));
 	            			Connect.setData(x);
 	            		}
-	            		ServerData.send2Followers(senderIP,txt);
-            		}
+	            		ServerData.send2Followers(sendersln,txt);
+            		
             }
             else if(CMD.equals("LISTEN"))
             {
             		HashSet<String> receivedIPs=new HashSet<String>();
             		String sendersln=in.readLine();
             		String senders[]=sendersln.split(",");
-            		for(int i=0;i<senders.length;i++)
+            		int i;
+            		for(i=0;i<senders.length;i++)
             			receivedIPs.add(senders[i]);
+            		Iterator<String> it_friends=ServerData.followers.iterator();
+            		boolean includingFollowers=false;
+            		while(it_friends.hasNext())
+            			if(receivedIPs.contains(it_friends.next()))
+            			{
+            				if(includingFollowers) //not the 1st follower passing it
+            				{
+            					s.close();
+                    			return;
+            				}
+            				includingFollowers=true;
+            			}
+            		
             		
             		System.out.println("My Address: "+s.getLocalAddress());
             		System.out.println("Senders addresses: "+sendersln);
+            		
+            		//if you are one of the senders....this will NEVER happen; handled b4 sending!
             		if(receivedIPs.contains(s.getLocalAddress().toString()))
             		{
             			System.out.println("DUPLICATION ignored from:"+sendersln);
