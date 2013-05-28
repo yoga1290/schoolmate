@@ -403,6 +403,8 @@ class DataTransferThread extends Thread implements Runnable
 	private ServerSocket ss;
 	
 	private String senders="";
+	
+	@Deprecated
 	public DataTransferThread(int port)//,ServerData data)
 	{
 		this.port=port;
@@ -545,7 +547,9 @@ class ServerRequestHandler extends Thread implements Runnable
             		for(int i=0;i<senders.length;i++)
             			receivedIPs.add(senders[i]);
             		
-            		if(receivedIPs.contains(s.getLocalAddress()))
+            		System.out.println("My Address: "+s.getLocalAddress());
+            		System.out.println("Senders addresses: "+sendersln);
+            		if(receivedIPs.contains(s.getLocalAddress().toString()))
             		{
             			System.out.println("DUPLICATION ignored from:"+sendersln);
             			s.close();
