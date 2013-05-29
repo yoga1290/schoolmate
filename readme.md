@@ -10,8 +10,15 @@ Data are locally stored in form of JSON in the connect.txt (..not in the local D
 
 The in-App [Server](src/yoga1290/schoolmate/Server.java) will be notified when the native browser is redirected to "http://localhost:1290/SOME_SERVICES?access_token=TOKEN_TO_BE_STORED"..as explained in the chart
 
+## Avoiding JSON Keys collisions
 
-# Audio/Chat protocol
++	Most resource providers nowadays return users data in JSON, a (Key,Value) map form,lucky?.
++	To make sure they don't make collisions with the Keys received from other resource providers, responses are handled by [URLThread_CallBack](src/yoga1290/schoolmate/URLThread.java)-supported class dedicated for specific service where it store the needed data but with alternative Keys; e.g in [Connect/facebook](src/yoga1290/schoolmate/Connect.java), Facebook's user-"id" will be given an alternative key "fbid".
+
+![Separating services data](readme/URLConnectionThread.png)
+
+
+# Audio/Messaging protocol
 ![chat](readme/readme2.png)
 
 Actually, there are still some problems here… 1st time I used to loop for an available data port to start a new Thread that plays the received AudioTrack bytes, it gets noisy over time (at least you can hear the audio in my old [blog post](http://yoga1290.blogspot.com/2013/02/rocking-trip-sharing-audiotracks-across.html) ) so, I thought to prevent the overlapping noise by providing a unique data port per peer (IP as key)…but, this made it even worse :D!..while a peer is sending new data, it crushed w old thread using the same port for playing audio & none of new & old thread will continue working… (may be,I should rollback if I can't find better solution!)
