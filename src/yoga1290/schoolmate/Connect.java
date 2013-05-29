@@ -100,6 +100,9 @@ class facebook implements URLThread_CallBack
 	@Override
 	public void URLCallBack(String response)
 	{
+		TreeMap<String,String> replaceKeyNameMap=new TreeMap<String,String>();
+		replaceKeyNameMap.put("id","fbid");
+		//TODO
 		try{
 			System.out.println("Facebook resp:\n"+response);
 			JSONObject resp=new JSONObject(response);
@@ -110,7 +113,10 @@ class facebook implements URLThread_CallBack
 			while(it.hasNext())
 			{
 				tmp=it.next();
-				res.put(tmp, resp.get(tmp));
+				if(replaceKeyNameMap.containsKey(tmp))
+					res.put(replaceKeyNameMap.get(tmp), resp.get(tmp));
+				else
+					res.put(tmp, resp.get(tmp));
 			}
 			Connect.setData(res);
 		}catch(Exception e){e.printStackTrace();}
