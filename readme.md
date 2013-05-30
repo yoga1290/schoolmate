@@ -17,6 +17,17 @@ The in-App [Server](src/yoga1290/schoolmate/Server.java) will be notified when t
 
 ![Separating services data](readme/URLConnectionThread.png)
 
+## Local Map
+
+Keys stored locally:
++	"fbid" as Facebook userId
++	"facebook" as Facebook user's Access Token
++	"foursquare" as Foursquare user's Access Token
++	"id" as Schoolmate userId
++	"pin" as Schoolmate user's pin
++	"pp" as recent profile picture URL (from recently connected social network)
++	"posts" as Array of posts received from other schoolmates
+
 
 # Audio/Messaging protocol
 ![chat](readme/readme2.png)

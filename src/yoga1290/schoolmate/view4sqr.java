@@ -51,7 +51,7 @@ public class view4sqr extends Fragment implements OnClickListener,URLThread_Call
         Button checkin= (Button)v.findViewById(R.id.checkin);
         checkin.setOnClickListener(this);
         
-        Button attendance=(Button) v.findViewById(R.id.button1);
+        Button attendance=(Button) v.findViewById(R.id.button_connect);
         final Activity c=this.getActivity();
         attendance.setOnClickListener(new OnClickListener() {
 			

@@ -28,28 +28,37 @@
         android:text="Student ID" />
 
     <Button
-        android:id="@+id/button_connect_google"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/editText_pin"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/connectgoogle" />
-
-    <Button
-        android:id="@+id/button_connectfb"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/button_connect_google"
-        android:background="@drawable/connectfb" />
-
-    <Button
         android:id="@+id/button_connect4sqr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:background="@drawable/connect4sqr_small" />
+
+    <Button
+        android:id="@+id/button_connectfb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/button_connect4sqr"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/button_connect4sqr"
+        android:background="@drawable/fb" />
+
+    <Button
+        android:id="@+id/button_connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/editText_pin"
+        android:layout_below="@+id/editText_pin"
+        android:text="Login" />
+
+    <Button
+        android:id="@+id/button_connect_google"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/button_connect"
+        android:background="@drawable/connectgoogle" />
 
 </RelativeLayout>

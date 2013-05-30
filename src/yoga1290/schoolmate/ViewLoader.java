@@ -33,7 +33,7 @@ public class ViewLoader extends Fragment implements OnClickListener
     		
         // Inflate the layout for this fragment
         v=inflater.inflate(R.layout.view1, container, false);
-        Button connect=(Button) v.findViewById(R.id.button1);
+        Button connect=(Button) v.findViewById(R.id.button_connect);
         connect.setOnClickListener(this);
         
         ImageView mv=(ImageView) v.findViewById(R.id.imageView1);

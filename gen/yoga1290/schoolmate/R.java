@@ -16,17 +16,18 @@ public final class R {
         public static final int connect4sqr_small=0x7f020002;
         public static final int connectfb=0x7f020003;
         public static final int connectgoogle=0x7f020004;
-        public static final int ic_action_search=0x7f020005;
-        public static final int ic_launcher=0x7f020006;
+        public static final int fb=0x7f020005;
+        public static final int ic_action_search=0x7f020006;
+        public static final int ic_launcher=0x7f020007;
     }
     public static final class id {
         public static final int audioPeer=0x7f07001d;
         public static final int audioPeerOk=0x7f07001e;
-        public static final int button1=0x7f070007;
         public static final int button_class_details_fqsr=0x7f07000f;
         public static final int button_class_stream=0x7f070011;
-        public static final int button_connect4sqr=0x7f070006;
-        public static final int button_connect_google=0x7f070004;
+        public static final int button_connect=0x7f070006;
+        public static final int button_connect4sqr=0x7f070004;
+        public static final int button_connect_google=0x7f070007;
         public static final int button_connectfb=0x7f070005;
         public static final int button_post_row_fb=0x7f070018;
         public static final int button_post_row_tw=0x7f070017;

@@ -58,12 +58,6 @@ public class view_profile extends Fragment implements URLThread_CallBack
 		((TextView) v.findViewById(R.id.textView_post_row)).setText(txt);
 		return v;
 	}
-	public void getDataFrom(String uri)
-	{
-		//TODO Connect.getData().getString("")
-		URLThread_studentData=new URLThread(uri, this, "");
-		URLThread_studentData.start();
-	}
 	
 	@Override
 	public void URLCallBack(String response)
@@ -114,6 +108,11 @@ public class view_profile extends Fragment implements URLThread_CallBack
 				JSONObject json=new JSONObject(response);
 				final String ppURL=json.getJSONObject("picture").getJSONObject("data").getString("url");
 				
+				try{
+					Connect.setData(
+							Connect.getData().put("pp", ppURL)
+							);
+				}catch(Exception e){e.printStackTrace();}
 				
 				new Thread(new Runnable() {
 					@Override
@@ -125,6 +124,7 @@ public class view_profile extends Fragment implements URLThread_CallBack
 								(	(ImageView) (X.v.findViewById(R.id.imageview_profile_picture)) ).setImageBitmap(pp);
 							}
 						});
+						
 					}
 				}).start();
 				

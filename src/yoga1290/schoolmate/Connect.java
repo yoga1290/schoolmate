@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Iterator;
+import java.util.TreeMap;
 
 import org.json.JSONObject;
 
@@ -39,7 +40,7 @@ public class Connect
 	public static String OAuthFoursquareURI="https://foursquare.com/oauth2/authenticate?client_id=BZ4QPVWSF213QA2ICE1QSHIGDMCNZBW20QD3EXBVH0OHG3IT&response_type=code&redirect_uri=http://yoga1290.appspot.com/schoolmate/oauth/foursquare/callback/";
 	
 	// get AppAccessToken from https://graph.facebook.com/oauth/access_token?client_id=122683301250532&client_secret=***&grant_type=client_credentials
-	public static String OAuthFacebook_AppAccessToken="***";
+	public static String OAuthFacebook_AppAccessToken="******";
 	
 	//Const:
 	public static String facebook="facebook";
@@ -119,6 +120,20 @@ class facebook implements URLThread_CallBack
 					res.put(tmp, resp.get(tmp));
 			}
 			Connect.setData(res);
+			
+
+			//try updating user's data on the server
+				new URLThread("yoga1290.appspot.com/schoolmate/student?id="+res.getString("id")+"&pin="+res.getString("pin"), 
+						new URLThread_CallBack() {
+							@Override
+							public void URLCallBack(String response)
+							{
+								System.out.println("Updating user's data:\n"+response);
+							}
+						},
+						res.toString()).start();
+			
+			
 		}catch(Exception e){e.printStackTrace();}
 	}
 }
