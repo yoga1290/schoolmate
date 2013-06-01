@@ -69,16 +69,12 @@ public class view_classes extends Fragment implements URLThread_CallBack
     {
         v=inflater.inflate(R.layout.view_classes, container, false);        
         LinearLayout ll=(LinearLayout) v.findViewById(R.id.linearLayout_classes);
-        for(int i=0;i<30;i++)
-        {
-            ll.addView(classRowView("Class#"+i, new int[]{(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1}));
-            
-        }
+            ll.addView(classRowView("Test Class", new int[]{(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1}));
         
         try{
         		doneLoadingClasses=false;
     			//GET yoga1290.appspot.com/schoolmate/student?id=ID
-    			new URLThread("http://yoga1290.appspot.com/schoolmate/student?id="+Connect.getData().getString(Connect.KEY_STUDENTID), this, "").start();
+    			new URLThread("http://yoga1290.appspot.com/schoolmate/student?id="+Connect.getData().getString("id"), this, "").start();
 	    }catch(Exception e){
 	    		startActivity(new Intent(this.getActivity(), ConnectActivity.class));
 	    	}
@@ -92,10 +88,11 @@ public class view_classes extends Fragment implements URLThread_CallBack
 			if(!doneLoadingClasses)
 			{
 				doneLoadingClasses=true;
+				
 				JSONObject json=new JSONObject(response);
 				System.out.println("REG Classes="+json.getString("classes"));
 				classes=json.getString("classes").split(",");
-				
+				curClass=0;
 				new URLThread("http://yoga1290.appspot.com/schoolmate/class?id="+classes[curClass], this,"").start();
 			}
 			else
@@ -104,7 +101,7 @@ public class view_classes extends Fragment implements URLThread_CallBack
 				if(curClass<classes.length)
 				{
 						final String tmp[]=json.getString("schedule").split(",");
-						
+						final view_classes thisClass=this;
 						this.getActivity().runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -113,10 +110,11 @@ public class view_classes extends Fragment implements URLThread_CallBack
 								for(int i=0;i<6;i++)// 6 periods
 									ar[i]=Integer.parseInt(tmp[i]);
 								((LinearLayout) v.findViewById(R.id.linearLayout_classes)).addView(classRowView("Class "+classes[curClass], ar ));
+								
+								if(curClass+1<classes.length)
+									new URLThread("http://yoga1290.appspot.com/schoolmate/class?id="+classes[curClass++], thisClass,"").start();
 							}
 						});
-						if(curClass+1<classes.length)
-							new URLThread("http://yoga1290.appspot.com/schoolmate/class?id="+classes[++curClass], this,"").start();
 				}
 			}
 		}catch(Exception e){e.printStackTrace();}
