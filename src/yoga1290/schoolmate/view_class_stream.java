@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -125,9 +126,21 @@ public class view_class_stream extends Fragment implements OnClickListener, OnTo
 			@Override
 			public void onClick(View v)
 			{
-				try{
-					new URLThread("https://graph.facebook.com/"+Connect.getData().getString("fbid")+"/feed?access_token="+Connect.getData().getString("fb_access_token"), X, "message="+txt).start();
-				}catch(Exception e){e.printStackTrace();}
+					new Thread(new Runnable() {
+						
+						@Override
+						public void run() {
+							try{
+								String resp=facebookAPI.post(Connect.getData().getString("facebook"), Connect.getData().getString("fbid"), txt);
+								//TODO get facebook's post url & notify others
+								System.out.println("posting to fb:"+resp);
+							}catch(Exception e){
+								e.printStackTrace();
+								//no Facebook access?
+								startActivity(new Intent(X.getActivity(), ConnectActivity.class));
+							}
+						}
+					}).start();
 			}
 		});
 		
