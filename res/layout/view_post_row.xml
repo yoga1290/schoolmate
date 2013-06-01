@@ -26,6 +26,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView_post_row"
         android:layout_toLeftOf="@+id/button_post_row_tw"
-        android:text="Button" />
+        android:background="@drawable/fb" />
 
 </RelativeLayout>
