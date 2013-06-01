@@ -16,7 +16,6 @@ import android.os.Environment;
 
 public class Connect
 {
-	public static String KEY_STUDENTID="studentId";
 	public static boolean isConnected()
 	{
 		//TODO check aast id
@@ -36,11 +35,11 @@ public class Connect
 //				res+=new String(buff, 0, o);
 //			return new JSONObject(res).getString(service);
 	}
-	public static String OAuthFacebookURI="https://www.facebook.com/dialog/oauth?client_id=122683301250532&redirect_uri=http://yoga1290.appspot.com/schoolmate/oauth/facebook/callback/&scope=user_about_me,email,user_education_history&state=signup";
+	public static String OAuthFacebookURI="https://www.facebook.com/dialog/oauth?client_id=122683301250532&redirect_uri=http://yoga1290.appspot.com/schoolmate/oauth/facebook/callback/&scope=user_about_me,email,user_education_history,publish_stream&state=signup";
 	public static String OAuthFoursquareURI="https://foursquare.com/oauth2/authenticate?client_id=BZ4QPVWSF213QA2ICE1QSHIGDMCNZBW20QD3EXBVH0OHG3IT&response_type=code&redirect_uri=http://yoga1290.appspot.com/schoolmate/oauth/foursquare/callback/";
 	
 	// get AppAccessToken from https://graph.facebook.com/oauth/access_token?client_id=122683301250532&client_secret=***&grant_type=client_credentials
-	public static String OAuthFacebook_AppAccessToken="******";
+	public static String OAuthFacebook_AppAccessToken="***";
 	
 	//Const:
 	public static String facebook="facebook";
@@ -74,24 +73,7 @@ public class Connect
 	public static void addService(String name,String access_token) throws Exception
 	{
 			setData(getData().put(name, access_token));
-//			String res="";
-//			JSONObject json=new JSONObject();
-//			File file=new File(Environment.getExternalStorageDirectory().getPath()+"/connect.txt");
-//			if(file.exists())
-//			{
-//				FileInputStream in=new FileInputStream(Environment.getExternalStorageDirectory().getPath()+"/connect.txt");
-//				byte buff[]=new byte[200];
-//				int o;
-//				while((o=in.read(buff))>0)
-//					res+=new String(buff, 0, o);
-//				json=new JSONObject(res);
-//				in.close();
-//			}
-//			
-//			FileOutputStream out=new FileOutputStream(Environment.getExternalStorageDirectory().getPath()+"/connect.txt");
-//			json=json.put(name, access_token);
-//			out.write(json.toString().getBytes());
-//			out.close();
+
 	}
 	
 }
