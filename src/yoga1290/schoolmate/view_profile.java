@@ -72,8 +72,7 @@ public class view_profile extends Fragment implements URLThread_CallBack
 					
 					@Override
 					public void run() {
-						// TODO Auto-generated method stub
-						((LinearLayout) X.v.findViewById(R.id.linearLayout_profile_info)).addView(getRowView("HELLO!"));
+						((LinearLayout) v.findViewById(R.id.linearLayout_profile_info)).addView(getRowView("HELLO!"));
 					}
 				});
 //				X.getActivity().runOnUiThread(new Runnable() {
