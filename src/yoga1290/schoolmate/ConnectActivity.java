@@ -40,6 +40,11 @@ public class ConnectActivity extends Activity implements OnClickListener
         button_connect4sqr.setOnClickListener(this);
         button_connect_google.setOnClickListener(this);
         button_connectfb.setOnClickListener(this);
+        
+        try{
+	        	EditText_ID.setText(Connect.getData().getString("id"));
+	        	EditText_ID.setText(Connect.getData().getString("pin"));
+        }catch(Exception e){};
     }
 	@Override
 	public void onClick(View v) {
@@ -62,6 +67,7 @@ public class ConnectActivity extends Activity implements OnClickListener
 								@Override
 								public void URLCallBack(String response) {
 									//TODO check if the response is fine, close the activity
+									System.out.println("Update Done :)");
 									thisActivity.finish();
 								}
 							}, Connect.getData().toString());
