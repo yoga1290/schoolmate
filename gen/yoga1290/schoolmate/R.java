@@ -21,16 +21,16 @@ public final class R {
         public static final int ic_launcher=0x7f020007;
     }
     public static final class id {
-        public static final int audioPeer=0x7f07001d;
-        public static final int audioPeerOk=0x7f07001e;
+        public static final int audioPeer=0x7f07001e;
+        public static final int audioPeerOk=0x7f07001f;
         public static final int button_class_details_fqsr=0x7f07000f;
         public static final int button_class_stream=0x7f070011;
         public static final int button_connect=0x7f070006;
         public static final int button_connect4sqr=0x7f070004;
         public static final int button_connect_google=0x7f070007;
         public static final int button_connectfb=0x7f070005;
-        public static final int button_post_row_fb=0x7f070018;
-        public static final int button_post_row_tw=0x7f070017;
+        public static final int button_post_row_fb=0x7f070017;
+        public static final int button_post_row_tw=0x7f070016;
         public static final int checkin=0x7f070009;
         public static final int editText_class_steam=0x7f070010;
         public static final int editText_pin=0x7f070002;
@@ -38,22 +38,23 @@ public final class R {
         public static final int imageView1=0x7f070008;
         public static final int imageView_class_details=0x7f07000e;
         public static final int imageView_classes_row=0x7f070014;
-        public static final int imageview_profile_gpa=0x7f07001c;
-        public static final int imageview_profile_picture=0x7f070019;
+        public static final int imageView_post_row=0x7f070018;
+        public static final int imageview_profile_gpa=0x7f07001d;
+        public static final int imageview_profile_picture=0x7f07001a;
         public static final int linearLayout_class_agenda=0x7f07000b;
         public static final int linearLayout_class_details=0x7f07000d;
         public static final int linearLayout_class_stream=0x7f070012;
         public static final int linearLayout_classes=0x7f070013;
-        public static final int linearLayout_profile_info=0x7f07001b;
-        public static final int menu_settings=0x7f070020;
+        public static final int linearLayout_profile_info=0x7f07001c;
+        public static final int menu_settings=0x7f070021;
         public static final int pager=0x7f070000;
         public static final int pager_title_strip=0x7f070001;
         public static final int scrollView1=0x7f07000c;
-        public static final int stopbutton=0x7f07001f;
+        public static final int stopbutton=0x7f070020;
         public static final int textView1=0x7f07000a;
         public static final int textView_classes_row=0x7f070015;
-        public static final int textView_post_row=0x7f070016;
-        public static final int textview_profile_name=0x7f07001a;
+        public static final int textView_post_row=0x7f070019;
+        public static final int textview_profile_name=0x7f07001b;
     }
     public static final class layout {
         public static final int activity_class=0x7f030000;
