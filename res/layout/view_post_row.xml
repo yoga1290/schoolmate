@@ -3,14 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-
-
-        <TextView
-        android:id="@+id/textView_post_row"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
-
     <Button
         android:id="@+id/button_post_row_tw"
         android:layout_width="wrap_content"
@@ -24,8 +16,24 @@
         android:id="@+id/button_post_row_fb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView_post_row"
         android:layout_toLeftOf="@+id/button_post_row_tw"
         android:background="@drawable/fb" />
+
+    <ImageView
+        android:id="@+id/imageView_post_row"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/button_post_row_tw"
+        android:src="@drawable/ic_launcher" />
+
+    <TextView
+        android:id="@+id/textView_post_row"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="48dp"
+        android:text="TextView" />
 
 </RelativeLayout>
