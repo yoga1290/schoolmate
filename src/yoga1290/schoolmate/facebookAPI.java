@@ -179,14 +179,16 @@ public class facebookAPI
 		        ops.write(message.getBytes("UTF-8"));
 		        ops.close();
 		        InputStream in=connection.getInputStream();
-		        byte buff[]=new byte[in.available()];
+		        byte buff[]=new byte[200];
 	            int ch;
-	            while((ch=in.read(buff))!=-1)
+	            while((ch=in.read(buff))>0)
 	            		res+=new String(buff,0,ch);
+	            in.close(); // delete this line & have a SERIOUS NIGHTMARE!!
 			}catch(Exception e)
 			{
 				res=e.getMessage();
 			}
+			
 			return res;
 		}
 		public static String postLink(String access_token,String userID,String link,String message,String picture,String name,String caption,String description )

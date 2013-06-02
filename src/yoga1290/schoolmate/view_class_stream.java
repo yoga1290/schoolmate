@@ -1,6 +1,7 @@
 package yoga1290.schoolmate;
 
 import java.net.InetAddress;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -99,7 +100,7 @@ class RefreshThread extends Thread
 					x.loadData();
 				long last=new Date().getTime();
 				while(new Date().getTime()-last<5000);
-			}catch(Exception e){e.printStackTrace();}
+			}catch(Exception e){}
 		}
 	}
 }
@@ -131,9 +132,44 @@ public class view_class_stream extends Fragment implements OnClickListener, OnTo
 						@Override
 						public void run() {
 							try{
-								String resp=facebookAPI.post(Connect.getData().getString("facebook"), Connect.getData().getString("fbid"), txt);
-								//TODO get facebook's post url & notify others
-								System.out.println("posting to fb:"+resp);
+								String postid[]=
+									new JSONObject(
+										facebookAPI.post(Connect.getData().getString("facebook"), Connect.getData().getString("fbid"), txt)
+										)
+									.getString("id")
+									.split("_");
+								final String url="direct?href=facebook.com/"+postid[0]+"/posts/"+postid[1];
+								
+								//TODO get current class you recently checked in
+								new URLThread("http://yoga1290.appspot.com/schoolmate/class?id=",//+ class ID here
+											new URLThread_CallBack() {
+												@Override
+												public void URLCallBack(String response) {
+													try{
+														String studentsID[]=new JSONObject(response).getString("students").split(",");
+														for(int i=0;i<studentsID.length;i++)
+															new URLThread("http://yoga1290.appspot.com/schoolmate/student?id="+studentsID[i], 
+																	new URLThread_CallBack() {
+																		@Override
+																		public void URLCallBack(String response) {
+																			try{
+																				String fbid=new JSONObject(response).getString("fbid");
+																				new URLThread("https://graph.facebook.com/"+fbid+"/notifications?access_token="+Connect.OAuthFacebook_AppAccessToken+"&template="+"&href="+url,
+																						new URLThread_CallBack() {
+																							@Override
+																							public void URLCallBack(String response) {
+																								// TODO the notification should now be sent to this student in this class, so nothing to do?!
+																							}
+																						}, "").start();
+																			}catch(Exception e){e.printStackTrace();}
+																		}
+																	}, "").start();
+														
+													}catch(Exception e){e.printStackTrace();}
+												}
+											}, "").start();
+								
+								
 							}catch(Exception e){
 								e.printStackTrace();
 								//no Facebook access?
@@ -178,7 +214,7 @@ public class view_class_stream extends Fragment implements OnClickListener, OnTo
 						}
 					}catch(Exception e2){e2.printStackTrace();}
 					lastPost=posts.length();
-				}catch(Exception e){e.printStackTrace();}
+				}catch(Exception e){}
 			}
 		}).start();
 	}
@@ -209,7 +245,6 @@ public class view_class_stream extends Fragment implements OnClickListener, OnTo
         ll.addView(v3);
         
         X=this.getActivity();
-        loadData();
         new RefreshThread(this).start();
         return v;
     }
