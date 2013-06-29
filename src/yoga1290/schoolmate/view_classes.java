@@ -36,7 +36,7 @@ public class view_classes extends Fragment implements URLThread_CallBack
 	int curClass=0;
 	boolean doneLoadingClasses=false;
 	String classes[];
-	public View classRowView(String name,final int ar[])
+	public View classRowView(final String class_id,String name,final int ar[])
 	{
 		LayoutInflater li = (LayoutInflater) this.getActivity().getSystemService(this.getActivity().LAYOUT_INFLATER_SERVICE);
 		View v=li.inflate(R.layout.view_classes_row, null);
@@ -52,7 +52,8 @@ public class view_classes extends Fragment implements URLThread_CallBack
 					String data=""+ar[0];
 					for(int i=1;i<6;i++)
 						data+=","+ar[i];
-					Connect.addService("current_class",data);
+					Connect.setData(Connect.getData().put("class_id", class_id));
+					Connect.setData(Connect.getData().put("schedule", data));
 				}catch(Exception e){e.printStackTrace();}
 				
 				startActivity(new Intent(c, ClassActivity.class)	);
@@ -69,14 +70,16 @@ public class view_classes extends Fragment implements URLThread_CallBack
     {
         v=inflater.inflate(R.layout.view_classes, container, false);        
         LinearLayout ll=(LinearLayout) v.findViewById(R.id.linearLayout_classes);
-            ll.addView(classRowView("Test Class", new int[]{(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1}));
+            ll.addView(classRowView("1","Test Class", new int[]{(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1,(int)(120*Math.random())+1}));
         
         try{
         		doneLoadingClasses=false;
-    			//GET yoga1290.appspot.com/schoolmate/student?id=ID
-    			new URLThread("http://yoga1290.appspot.com/schoolmate/student?id="+Connect.getData().getString("id"), this, "").start();
-	    }catch(Exception e){
-	    		startActivity(new Intent(this.getActivity(), ConnectActivity.class));
+    			//GET yoga1290.appspot.com/schoolmate/student?id=ID&pin
+    			new URLThread("http://yoga1290.appspot.com/schoolmate/student?id="+Connect.getData().getString("id")+"&pin="+Connect.getData().getString("pin"), this, "").start();
+	    }catch(Exception e)
+	    {
+	    		
+	    		startActivity(new Intent(this.getActivity(), MainActivity.class));
 	    	}
         
         return v;
@@ -109,7 +112,7 @@ public class view_classes extends Fragment implements URLThread_CallBack
 								int ar[]=new int[6];
 								for(int i=0;i<6;i++)// 6 periods
 									ar[i]=Integer.parseInt(tmp[i]);
-								((LinearLayout) v.findViewById(R.id.linearLayout_classes)).addView(classRowView("Class "+classes[curClass], ar ));
+								((LinearLayout) v.findViewById(R.id.linearLayout_classes)).addView(classRowView(classes[curClass],"Class "+classes[curClass], ar ));
 								
 								if(curClass+1<classes.length)
 									new URLThread("http://yoga1290.appspot.com/schoolmate/class?id="+classes[curClass++], thisClass,"").start();
