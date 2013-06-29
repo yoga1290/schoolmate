@@ -1,5 +1,15 @@
 package yoga1290.schoolmate;
 
+import java.util.Set;
+
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.drm.DrmStore.Action;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -31,12 +41,106 @@ public class ClassActivity extends FragmentActivity {
 	 */
 	ViewPager mViewPager;
 
+	
+	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+	    public void onReceive(Context context, Intent intent) {
+	        String action = intent.getAction();
+	        // When discovery finds a device
+	        if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+	            // Get the BluetoothDevice object from the Intent
+	            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+	            // Add the name and address to an array adapter to show in a ListView
+	            System.out.println("Bluetooth FOUND: "+device.getName()+" , Address: "+device.getAddress());
+	            
+	            BluetoothServer.followers.add(device);
+	            try{
+	            		String peers="";
+	            		try{
+	            			peers=Connect.getData().getString("peers");
+	            		}catch(Exception e){e.printStackTrace();}
+	            		if(peers.length()==0)
+	            			peers=device.getAddress();
+	            		else
+	            			peers+=","+device.getAddress();
+	            		
+		            Connect.setData(
+		            		Connect.getData().put("peers", peers));
+		            
+	            }catch(Exception e){e.printStackTrace();}
+	        }
+	    }
+	};
+	final private int REQUEST_ENABLE_BT=1;
+	@Override
+	public void onActivityResult (int requestCode, int resultCode, Intent data)
+	{
+		System.out.println("ActivityResult");
+		if(requestCode==REQUEST_ENABLE_BT)
+		{
+			System.out.println("requestCode= REQUEST_ENABLE_BT");
+			if(resultCode==Activity.RESULT_OK)
+			{
+				System.out.println("resultCode= RESULT_OK");
+				// Register the BroadcastReceiver
+				IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+				registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
+				
+				Intent discoverableIntent = new	Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+//				discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+				startActivity(discoverableIntent);
+				BluetoothAdapter.getDefaultAdapter().startDiscovery();
+				new BluetoothServer().start();
+			}
+		}
+	}
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		
+		
+		
+		// Register the BroadcastReceiver
+		IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+		registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
+					
+		BluetoothAdapter mBluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
+//		Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+//		// If there are paired devices
+//		if (pairedDevices.size() > 0) {
+//		    // Loop through paired devices
+//		    for (BluetoothDevice device : pairedDevices) {
+//		    		BluetoothServer.followers.add(device);
+//	            try{
+//	            		String peers="";
+//	            		try{
+//	            			peers=Connect.getData().getString("peers");
+//	            		}catch(Exception e){e.printStackTrace();}
+//	            		if(peers.length()==0)
+//	            			peers=device.getAddress();
+//	            		else
+//	            			peers+=","+device.getAddress();
+//	            		
+//		            Connect.setData(
+//		            		Connect.getData().put("peers", peers));
+//		            
+//	            }catch(Exception e){e.printStackTrace();}
+//		    }
+//		}
+		
+		if (!mBluetoothAdapter.isEnabled()) {
+		    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+		    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+		}
+		else
+		{
+			new BluetoothServer().start();
+			mBluetoothAdapter.startDiscovery();
+		}
+		
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(
@@ -46,7 +150,14 @@ public class ClassActivity extends FragmentActivity {
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 	}
-
+	
+	@Override
+	protected void onDestroy()
+	{
+		unregisterReceiver(mReceiver);
+		super.onDestroy();
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -60,7 +171,7 @@ public class ClassActivity extends FragmentActivity {
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-		final int PAGE_COUNT = 4;
+		final int PAGE_COUNT = 3;
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
 		}
@@ -83,10 +194,10 @@ public class ClassActivity extends FragmentActivity {
     				return new view_class_details();
     			case 1:
     				return new view_class_stream();
+//    			case 2:
+//    				return new view_class_agenda();
     			case 2:
-    				return new view_class_agenda();
-//    			case 3:
-//    				return new view_class_details();
+    				return new RecorderView();
     		}
 		return new view_profile();
     			
