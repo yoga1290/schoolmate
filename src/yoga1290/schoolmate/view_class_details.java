@@ -1,6 +1,10 @@
 package yoga1290.schoolmate;
 
+import org.json.JSONObject;
+
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,10 +14,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class view_class_details extends Fragment implements URLThread_CallBack
+public class view_class_details extends Fragment
 {
 	View v;
-	
+	final Activity currentActivity=this.getActivity();
 	
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -22,38 +26,37 @@ public class view_class_details extends Fragment implements URLThread_CallBack
         v=inflater.inflate(R.layout.view_class_details, container, false);
         
         ImageView mv=(ImageView) v.findViewById(R.id.imageView_class_details);
-//        try{
-////        		Connect.getData().getString(Connect.KEY_STUDENTID);
-//        		new URLThread("http://yoga1290.appspot.com/schoolmate/classes?student="+Connect.getData().getString(Connect.KEY_STUDENTID), this, "").start();
-//        }catch(Exception e){
-//        		startActivity(new Intent(this.getActivity(), ConnectActivity.class));
-//        }
-//        LinearLayout ll=(LinearLayout) v.findViewById(R.id.linearLayout_class_details);
-//        for(int i=0;i<3;i++)
-//        {
-//            TextView tv=new TextView(this.getActivity());
-//            tv.setText("detail#"+i);
-//            ll.addView(tv);
-//        }
-        int schdule[]=new int[]{1,1,1,127,	100,40};
+
         try{
-        		String data[]=Connect.getData().getString("current_class").split(",");
-        		for(int i=0;i<6;i++)
-        			schdule[i]=Integer.parseInt(data[i]);
-//        		System.out.println(Connect.getData().getString("current_class"));
-        }
-        catch(Exception e){e.printStackTrace();}
-        mv.setImageBitmap(Charts.getClassTimetable(500, 500, schdule));
+	        new URLThread("http://yoga1290.appspot.com/schoolmate/class?id="+Connect.getData().getString("current_class"), new URLThread_CallBack() {
+				
+				@Override
+				public void URLCallBack(String class_response) {
+					try{
+						String tmp[]=new JSONObject(class_response).getString("schedule").split(",");
+						int schedule[]=new int[tmp.length];
+						for(int i=0;i<schedule.length;i++)
+							schedule[i]=Integer.parseInt(tmp[i]);
+						
+						final Bitmap timetable= Charts.getClassTimetable(500, 500, 
+								schedule);
+						
+//						currentActivity.runOnUiThread(new Runnable() {
+//							@Override
+//							public void run() {
+//								// TODO Auto-generated method stub
+								((ImageView) v.findViewById(R.id.imageView_class_details))
+									.setImageBitmap(timetable);
+//							}
+//						});
+						
+					}catch(Exception e){e.printStackTrace();}
+				}
+			}, "").start();
+        }catch(Exception e){e.printStackTrace();}
         
         return v;
     }
-
-
-	@Override
-	public void URLCallBack(String response) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	
 }
