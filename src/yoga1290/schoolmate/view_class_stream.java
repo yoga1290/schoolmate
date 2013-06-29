@@ -28,6 +28,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -39,7 +40,9 @@ class RecordingThread extends Thread
 	public void run()
 	{
 		long t=new Date().getTime();
+		//wait for 2s after the button press
 		while(new Date().getTime()-t<2000);
+		//if no button release happened
 		if(!inturrped) record=true;
 		
 		ArrayList<ByteBuffer> data=new ArrayList<ByteBuffer>();
@@ -48,35 +51,15 @@ class RecordingThread extends Thread
 		{
 			AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                     AudioProperties.sampleRateInHz, AudioProperties.channelConfigIN,AudioProperties.audioFormat, AudioProperties.bufferSizeIN);
-
 			recorder.startRecording();
 			int o=0,totalLength=0;//ending offset
-			
 			System.out.println("RECORDING...");
 			while(record)
 			{
 				o=recorder.read(buff, 0, buff.length);
 						if(AudioRecord.ERROR_INVALID_OPERATION != o && o>0)
-						{
-//							totalLength+=o;
-//							data.add(ByteBuffer.wrap(buff, 0, o));
 							ServerData.send2Followers("",buff,o);
-						}			
 			}
-			
-//			System.out.println("SENDING AUDIO DATA...");
-//			if(totalLength>0)
-//			{
-//				byte all[]=new byte[totalLength];
-//				int i,j,p=0;
-//				for(i=0;i<data.size();i++)
-//				{
-//					buff=data.get(i).array();
-//					for(j=0;j<buff.length;j++)
-//						all[p++]=buff[j];
-//				}
-//				ServerData.send2Followers("",all,all.length);
-//			}
 			recorder.stop();
 	        recorder.release();
 		}
@@ -110,7 +93,7 @@ public class view_class_stream extends Fragment implements OnClickListener, OnTo
 	private long lastPress=0,lastRelease=0;
 	private RecordingThread record=null;
 	private Button button_post;
-	Activity X=this.getActivity();
+	final Activity X=this.getActivity();
 	LayoutInflater li;
 	int lastPost=0;
 	URLThread URLThread_studentData=null,URLThread_facebookData=null;
@@ -122,7 +105,40 @@ public class view_class_stream extends Fragment implements OnClickListener, OnTo
 		View v=li.inflate(R.layout.view_post_row, null);
 		//TODO listeners
 		((TextView) v.findViewById(R.id.textView_post_row)).setText(txt);
-		final view_class_stream X=this;
+		((ImageView) v.findViewById(R.id.imageView_post_row)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				try{
+					//get the sender id value from the post JSON data
+					Connect.setData(
+							Connect.getData().put("cur_profileid", new JSONObject(txt).getString("id"))
+							);
+					//@see http://stackoverflow.com/questions/2424488/android-new-intent-starts-new-instance-with-androidlaunchmode-singletop
+					Intent intent= new Intent(X.getBaseContext(), ProfileActivity.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+					startActivity(intent	);
+				}catch(Exception e){e.printStackTrace();}
+			}
+		});
+		
+//		try
+//		{
+//			new URLThread("http://yoga1290.appspot.com/schoolmate/student?id="+new JSONObject(txt).getString("id"),
+//					new URLThread_CallBack() {
+//						@Override
+//						public void URLCallBack(String response) {
+//							try{
+//								JSONObject userdata=new JSONObject(response);
+//								try
+//								{
+//									userdata.getString("pp");
+//								}catch(Exception e){e.printStackTrace();}
+//							}catch(Exception e){e.printStackTrace();}
+//						}
+//					}, "").start();
+//		}catch(Exception e){e.printStackTrace();}
+		
+		
 		( (Button)v.findViewById(R.id.button_post_row_fb)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v)
@@ -132,32 +148,39 @@ public class view_class_stream extends Fragment implements OnClickListener, OnTo
 						@Override
 						public void run() {
 							try{
+								String fbresponse=facebookAPI.post(Connect.getData().getString("facebook"), Connect.getData().getString("fbid"), txt);
+								System.out.println("fb post response:"+fbresponse);
 								String postid[]=
 									new JSONObject(
-										facebookAPI.post(Connect.getData().getString("facebook"), Connect.getData().getString("fbid"), txt)
+											fbresponse
+//										facebookAPI.post(Connect.getData().getString("facebook"), Connect.getData().getString("fbid"), txt)
 										)
 									.getString("id")
 									.split("_");
-								final String url="direct?href=facebook.com/"+postid[0]+"/posts/"+postid[1];
+								final String url="/direct/"+postid[0]+"/"+postid[1];//,"UTF-8");
 								
+								System.out.println("fb post url="+url);
 								//TODO get current class you recently checked in
-								new URLThread("http://yoga1290.appspot.com/schoolmate/class?id=",//+ class ID here
+								new URLThread("http://yoga1290.appspot.com/schoolmate/class?id="+Connect.getData().getString("current_class"),//+ class ID here
 											new URLThread_CallBack() {
 												@Override
-												public void URLCallBack(String response) {
+												public void URLCallBack(String students) {
+													System.out.println("fbNotifying student#"+students);
 													try{
-														String studentsID[]=new JSONObject(response).getString("students").split(",");
+														String studentsID[]=new JSONObject(students).getString("students").split(",");
 														for(int i=0;i<studentsID.length;i++)
 															new URLThread("http://yoga1290.appspot.com/schoolmate/student?id="+studentsID[i], 
 																	new URLThread_CallBack() {
 																		@Override
-																		public void URLCallBack(String response) {
+																		public void URLCallBack(String student) {
 																			try{
-																				String fbid=new JSONObject(response).getString("fbid");
+																				String fbid=new JSONObject(student).getString("fbid");
+																				System.out.println("fbid:"+fbid);
 																				new URLThread("https://graph.facebook.com/"+fbid+"/notifications?access_token="+Connect.OAuthFacebook_AppAccessToken+"&template="+"&href="+url,
 																						new URLThread_CallBack() {
 																							@Override
 																							public void URLCallBack(String response) {
+																								System.out.println("fbnotification resp:"+response);
 																								// TODO the notification should now be sent to this student in this class, so nothing to do?!
 																							}
 																						}, "").start();
@@ -173,7 +196,11 @@ public class view_class_stream extends Fragment implements OnClickListener, OnTo
 							}catch(Exception e){
 								e.printStackTrace();
 								//no Facebook access?
-								startActivity(new Intent(X.getActivity(), ConnectActivity.class));
+								//startActivity(new Intent(X, MainActivity.class));
+								Intent intent= new Intent(X, MainActivity.class);
+								// @see http://stackoverflow.com/questions/2424488/android-new-intent-starts-new-instance-with-androidlaunchmode-singletop
+								intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+								startActivity(intent	);
 							}
 						}
 					}).start();
@@ -231,20 +258,11 @@ public class view_class_stream extends Fragment implements OnClickListener, OnTo
         button_post.setOnClickListener(this);
 		
         ll=(LinearLayout) v.findViewById(R.id.linearLayout_class_stream);
-                
-        View v2=li.inflate(R.layout.view_post_row, null);
-//        View v2=inflater.inflate(R.layout.view_newpost, container, false);
-//        ((TextView)v2.findViewById(R.id.textView_newpost_text)).setText("Post#1");
         
+        View v2=li.inflate(R.layout.view_post_row, null);
         ll.addView(v2);
         
-        View v3=li.inflate(R.layout.view_post_row, null);
-//        View v3=inflater.inflate(R.layout.view_newpost, container, false);
-//        ((TextView)v3.findViewById(R.id.textView_newpost_text)).setText("Post#2");
-        
-        ll.addView(v3);
-        
-        X=this.getActivity();
+//        X=this.getActivity();
         new RefreshThread(this).start();
         return v;
     }
@@ -261,12 +279,15 @@ public class view_class_stream extends Fragment implements OnClickListener, OnTo
 				public void run()
 				{
 					try{
-						JSONObject json=new JSONObject();
-						json.put("text", txt);
-						//TODO IP fix
-						ServerData.send2Followers(json.toString());
+						JSONObject post=new JSONObject();
+						post.put("text", txt);
+						post.put("id", Connect.getData().getString("id"));
 						
-						ll.addView(postRowView(txt));
+						ServerData.send2Followers(post.toString());
+						
+						BluetoothServer.send2Followers("", post.toString());
+						
+						ll.addView(postRowView(post.toString()));
 						
 					}catch(Exception e){e.printStackTrace();}
 				}
