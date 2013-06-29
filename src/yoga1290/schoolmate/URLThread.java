@@ -23,8 +23,6 @@ interface URLThread_CallBack
 
 public class URLThread extends Thread
 {
-	
-	
 	private String url,POSTdata="";
 	private URLThread_CallBack callback;
 	public URLThread(String url,URLThread_CallBack callback,String POSTdata)
@@ -49,11 +47,14 @@ public class URLThread extends Thread
                         "Content-type: application/x-http-form-urlencoded\r\n\r\n";
         out.write((header).getBytes());
         out.write((POSTdata+"\r\n\r\n\n").getBytes());
+        out.close();
         int i;
         String res="";
         byte buff[]=new byte[100];
         while((i=in.read(buff))>0)
             res+=new String(buff,0,i);
+        in.close();
+        s.close();
         return res;
     }
 	
@@ -71,35 +72,18 @@ public class URLThread extends Thread
 		    	  	connection.setRequestMethod("GET");
 		      else
 		      {
+		    	  	//POST response
 		    	  	res= HTTPPost(this.url,POSTdata);
 		    	  	if(callback!=null) //thread still alive?
 			    	  	callback.URLCallBack(res);
 		    	  	return;
-//		    	  	connection.setRequestMethod("POST");
-//		    	  	connection.setRequestProperty("Content-Type", 
-//		           "application/x-www-form-urlencoded");
-//					
-//		    	  	connection.setRequestProperty("Content-Length", "" + 
-//		               Integer.toString(POSTdata.getBytes().length)); 
-//		    	  	
-//		    	  	connection.setUseCaches (false);
-//				connection.setDoInput(true);
-//				      
-//			      connection.setDoOutput(true);
-//
-////			      Send request
-//			      DataOutputStream wr = new DataOutputStream (
-//			                  connection.getOutputStream ());
-//			      wr.writeBytes(POSTdata);
-//			      wr.flush ();
-//			      wr.close ();				      
 		    	  }
 
 		      
 
-		      //Get Response	
+		      //GET Response	
 		      InputStream is = connection.getInputStream();
-		      byte buff[]=new byte[500];
+		      byte buff[]=new byte[200];
 		      int i;
 		      while((i=is.read(buff))>-1)
 		    	  		res+=new String(buff,0,i);
@@ -109,8 +93,6 @@ public class URLThread extends Thread
 		    	  	callback.URLCallBack(res);
 		      
 		    } catch (Exception e) {
-		    	// Counter for Bad Requests (Google Analytics)
-//		    	_ea.tracker.trackPageView("/BadRequest");
 		      e.printStackTrace();
 		      System.out.println("Error:"+e);
 		      callback.URLCallBack("Error:"+e.getMessage());
