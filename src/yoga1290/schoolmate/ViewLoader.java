@@ -108,6 +108,6 @@ public class ViewLoader extends Fragment implements OnClickListener
     
 	@Override
 	public void onClick(View v) {
-		startActivity(new Intent(this.getActivity(), ConnectActivity.class));
+		startActivity(new Intent(this.getActivity(), MainActivity.class));
 	}
 }

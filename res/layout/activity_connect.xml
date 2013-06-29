@@ -25,7 +25,7 @@
         android:layout_marginTop="14dp"
         android:ems="10"
         android:inputType="text"
-        android:text="Student ID" />
+        android:text="id" />
 
     <Button
         android:id="@+id/button_connect4sqr"
@@ -51,7 +51,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignRight="@+id/editText_pin"
         android:layout_below="@+id/editText_pin"
-        android:text="Login" />
+        android:text="Login/Update" />
 
     <Button
         android:id="@+id/button_connect_google"

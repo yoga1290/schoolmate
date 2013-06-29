@@ -1,163 +1,116 @@
 package yoga1290.schoolmate;
 
-
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.LinkedList;
-
-import org.json.JSONArray;
+import java.util.zip.Inflater;
 
 import yoga1290.schoolmate.R;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.media.AudioFormat;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
-import android.media.AudioRecord;
-import android.media.AudioTrack;
+import android.media.AudioManager.OnAudioFocusChangeListener;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.view.Menu;
-//import android.app.FragmentManager;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.EditText;
 
-public class MainActivity extends FragmentActivity {
-
+public class MainActivity extends Activity implements OnClickListener
+{
 	public ServerData data=new ServerData();
-	@Override
+	EditText		EditText_ID,EditText_PIN;
+	final Activity currentActivity=this;
+	Button		button_connect,button_connectfb,button_connect_google,button_connect4sqr;
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-		setContentView(R.layout.activity_main);
-        if(!Connect.isConnected())
-        {
-        		Intent connectActivity=new Intent(this.getApplicationContext(), ConnectActivity.class);
-        		startActivity(connectActivity);
-        }
- //testing adding a post
-//        try{
-//        		Connect.getData().put("posts", new JSONArray().put("Post1").put("Post2").toString());
-//        		System.out.println(Connect.getData().toString());
-//        }catch(Exception e){e.printStackTrace();}
+        setContentView(R.layout.activity_connect);
         
-        System.out.println("Starting server");
-        new Server(data).start();
-//        new AudioServer(1292).start();
+        EditText_ID=(EditText) findViewById(R.id.et_connect);
+        EditText_PIN=(EditText) findViewById(R.id.editText_pin);
         
+        button_connect=(Button) findViewById(R.id.button_connect);
+        button_connectfb=(Button) findViewById(R.id.button_connectfb);
+        button_connect4sqr=(Button) findViewById(R.id.button_connect4sqr);
+        button_connect_google=(Button) findViewById(R.id.button_connect_google);
         
+        button_connect.setOnClickListener(this);
+        button_connect4sqr.setOnClickListener(this);
+        button_connect_google.setOnClickListener(this);
+        button_connectfb.setOnClickListener(this);
         
-        /** Getting a reference to the ViewPager defined the layout file */
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        try{
+	        	EditText_ID.setText(Connect.getData().getString("id"));
+	        	EditText_ID.setText(Connect.getData().getString("pin"));
+        }catch(Exception e){};
         
-//        PagerTitleStrip pts=(PagerTitleStrip) pager.findViewById(R.id.pager_title_strip);
-//        pts.set
- 
-        /** Getting fragment manager */
-        FragmentManager fm = getSupportFragmentManager();
- 
-        /** Instantiating FragmentPagerAdapter */
-        MyFragmentPagerAdapter pagerAdapter = new MyFragmentPagerAdapter(fm);
- 
-        /** Setting the pagerAdapter to the pager object */
-        pager.setAdapter(pagerAdapter);
+        try{
+    			String id=null;
+	    		try{
+	    			id=Connect.getData().getString("id");
+	        		Connect.setData(
+	        				Connect.getData().put("cur_profileid", id) );
+	    		}catch(Exception e){e.printStackTrace();}
+    		
+    		
+	    		if(id!=null)
+	    		{
+	    			Intent connectActivity=new Intent(this.getApplicationContext(), ProfileActivity.class);
+	    			startActivity(connectActivity);
+	    		}
+        }catch(Exception e){e.printStackTrace();}
     
-//        setContentView(R.layout.activity_main);
+    System.out.println("Starting server");
+    new Server(data).start();
+        
     }
- 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.activity_main, menu);
-        return false;
-    }
-    
-    
+	@Override
+	public void onClick(View v) {
+		if(v.getId()==button_connect.getId())
+		{
+			final MainActivity thisActivity=this;
+			
+			try{
+				Connect.setData(
+					Connect.getData()
+						.put("id", EditText_ID.getText().toString())
+							.put("pin", EditText_PIN.getText().toString())
+								.put("cur_profileid", EditText_ID.getText().toString())
+					);				
+				startActivity(new Intent(currentActivity, ProfileActivity.class));
+				
+			}catch(Exception e){e.printStackTrace();}
+			
+			//TODO handle stuff
+			new URLThread("http://yoga1290.appospot.com/schoolmate/student?id="+EditText_ID.getText().toString()+"&pin="+EditText_PIN.getText().toString(),
+							new URLThread_CallBack(){
+								@Override
+								public void URLCallBack(String response) {
+									System.out.println("Update Done :)");
+								}
+							}, Connect.getData().toString()).start();
+		
+			
+		}
+		else
+		{
+				String uri="";
+				if(v.getId()==button_connect4sqr.getId())
+					uri=Connect.OAuthFoursquareURI;
+				if(v.getId()==button_connectfb.getId())
+					uri=Connect.OAuthFacebookURI;
+				
+				try
+				{
+					Intent i = new Intent(Intent.ACTION_VIEW);
+					i.setData(Uri.parse(uri));
+					this.startActivity(i);
+				}catch(Exception e){e.printStackTrace();}
+		}
+	}
+
 }
-
-
-class MyFragmentPagerAdapter extends FragmentPagerAdapter{
-	 
-    final int PAGE_COUNT = 3;
- 
-    /** Constructor of the class */
-    public MyFragmentPagerAdapter(FragmentManager fm) {
-        super(fm);
-    }
- 
-    /** This method will be invoked when a page is requested to create */
-    @Override
-    public Fragment getItem(int v)
-    {
-//        MyFragment myFragment = new MyFragment();
-//        Bundle data = new Bundle();
-//        data.putInt("current_page", arg0+1);
-//        frg.setArguments(data);
-//        myFragment.setArguments(data);
-//        return myFragment;
-    		switch(v)
-    		{
-    			case 0:
-    				return new view4sqr();
-    			case 1:
-    				return new RecorderView();
-    			//TODO:
-//    				profile
-    		}
-        return new view_classes();
-    }
- 
-    /** Returns the number of pages */
-    @Override
-    public int getCount()
-    {
-        return PAGE_COUNT;
-    }
-    
-    @Override
-    public CharSequence getPageTitle(int position) {
-        
-        return "section#"+position;
-    }
-}
-//
-//class MyFragment extends Fragment{
-//	 
-//    int mCurrentPage;
-//    View v;
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-// 
-//        /** Getting the arguments to the Bundle object */
-//        Bundle data = getArguments();
-// 
-//        /** Getting integer data of the key current_page from the bundle */
-//        mCurrentPage = data.getInt("current_page", 0);
-//        
-//    }
-// 
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        v = inflater.inflate(R.layout.activity_account, container,false);
-////        TextView tv = (TextView ) v.findViewById(R.id.tv);
-////        tv.setText("You are viewing the page #" + mCurrentPage + "\n\n" + "Swipe Horizontally left / right");
-//        
-//        if(mCurrentPage==2)
-//        {
-//        	
-////        		IntentIntegrator integrator = new IntentIntegrator(this.getActivity());
-////        		integrator.initiateScan();
-//        }
-//        return v;
-//    }
-//    
-//    	}
-// 
-//}
-
