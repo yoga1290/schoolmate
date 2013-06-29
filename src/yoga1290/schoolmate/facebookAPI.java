@@ -162,11 +162,11 @@ public class facebookAPI
 		 * @param message
 		 * @return
 		 */
-		public static String post(String access_token,String userID,String message)
+		public static String post(String access_token,String userID,String message) throws Exception
 		{
 			String res="";
-			try
-			{	
+//			try
+//			{	
 				URL url = new URL("https://graph.facebook.com/"+userID+"/feed?access_token="+access_token);
 		        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		        connection.setDoOutput(true);
@@ -177,6 +177,7 @@ public class facebookAPI
 		        OutputStream ops=connection.getOutputStream();
 		        ops.write("message=".getBytes());
 		        ops.write(message.getBytes("UTF-8"));
+//		        ops.flush();
 		        ops.close();
 		        InputStream in=connection.getInputStream();
 		        byte buff[]=new byte[200];
@@ -184,10 +185,8 @@ public class facebookAPI
 	            while((ch=in.read(buff))>0)
 	            		res+=new String(buff,0,ch);
 	            in.close(); // delete this line & have a SERIOUS NIGHTMARE!!
-			}catch(Exception e)
-			{
-				res=e.getMessage();
-			}
+	            ops.close();
+	            connection.disconnect();
 			
 			return res;
 		}
@@ -288,12 +287,10 @@ public class facebookAPI
 			return res;
 		}
 		
-		public static String postNotification(String app_access_token,String user_id,String template,String href)
+		public static String postNotification(String app_access_token,String user_id,String template,String href) throws Exception
 		{
 			///{recipient_userid}/notifications?access_token= � &template= � &href= �
 			String res="facebook.postNotification";
-			try
-			{	
 //				URL url = new URL("https://graph.facebook.com/"+user_id+"/notifications?access_token="+app_access_token+"&template="+URLEncoder.encode( template, "UTF-8").replaceAll("%20", " ")+"&href="+href);
 				URL url = new URL("https://graph.facebook.com/"+user_id+"/notifications?access_token="+app_access_token+"&template="+  URLEncoder.encode(template, "UTF-8")+"&href="+href);
 		        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -307,10 +304,7 @@ public class facebookAPI
 	            int ch;
 	            while((ch=in.read(buff))!=-1)
 	            		res+=new String(buff,0,ch);
-			}catch(Exception e)
-			{
-				res=res+"<br>"+e.getMessage();
-			}
+
 			return res;
 		}
 		public static String Action(String acess_token,String namespace,String ActionType,String objectType,String objectURL)
