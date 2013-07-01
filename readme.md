@@ -8,21 +8,22 @@ URLConnections are carried on separate threads and UI updates are packed in a ne
 > > 	@Override
 > > 	public void [URLCallBack](src/yoga1290/schoolmate/URLThread.java) (String response)
 > > 	{
-> > 		//queue this back on in the UI
-> > > 		currentActivity.runOnUiThread
-> > > 		(
+> > >		//queue this back on in the UI
+> > >		currentActivity.runOnUiThread
+> > > >		(
 > > > > > 			new Runnable()
-> > > > > 			{
+> > > > > >			{
 > > > > > > 				@Override
 > > > > > > 				public void run()
 > > > > > > 				{
 > > > > > > > 					findViewById(R.id.SOME_UI_Comp)
 > > > > > > > 						.doSomething();
 > > > > > > 				}
-> > > > 			}
-> > > 		);
->> 	}
-> }, "Optional POST DATA HERE,otherwise GET is used").start();
+> > > > >			}
+> > > >		);
+> > >	}
+> > }, "Optional POST DATA HERE,otherwise GET is used").start();
+> 
 
 # [Connect](src/yoga1290/schoolmate/Connect.java)
 
