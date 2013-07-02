@@ -42,18 +42,20 @@ In-App Socket Server that handles couple of things:
 +	Later, the access token is used to establish a URLConnection to retrieve the users data (e.g: Facebook/Foursqaure ID)… but KEYS from their JSON responses may clash with others in the [Connect.json](src/yoga1290/schoolmate/Connect.java)… so, before storing any data, there will be URLConnection CallBack Handlers to avoid JSON Keys collision
 ![Avoiding JSON Key Collision](readme/URLConnectionThread.png)
 
-+	Sociability (Audio/Messaging)
++	**Sociability (Audio/Messaging)**
 
 ![Sociability](readme/readme2.png)
 
 When the in-App Server accepts a client, it uses the 1st line of input as an [**CMD**](src/yoga1290/schoolmate/Server.java#L506)
 
 Raw Audio data is streamed in case of the **LISTEN** [**CMD**](src/yoga1290/schoolmate/Server.java#L506) that is played on separate AudioTrack [DataTransferThread](src/yoga1290/schoolmate/Server.java#L405)
+
+
 [PCM-16](http://en.wikipedia.org/wiki/Pulse-code_modulation) constants are stored in [AudioProperties class](src/yoga1290/schoolmate/Server.java#L47)  
 
 My implementation is very close to what's on [Google Blog](http://eurodev.blogspot.com/2009/09/raw-audio-manipulation-in-android.html) but I don't care about saving data
 
-+	Avoiding duplicated messages
++	**Avoiding duplicated messages**
 
 If it's receiving a **POST** or a **LISTEN** command,then it'll add its address to the received list before passing the data to other peers that aren't mentioned in the next line.
 
@@ -70,11 +72,11 @@ If it's receiving a **POST** or a **LISTEN** command,then it'll add its address 
 
 ![Activities](readme/activities.png)
 
-+	[**Connect/MainActivity**](src/yoga1290/schoolmate/MainActivity.java) , It should be starting as the very 1st view and whenever there's a need for an access token
++	[Connect/MainActivity](src/yoga1290/schoolmate/MainActivity.java) , It should be starting as the very 1st view and whenever there's a need for an access token
 
-+	[**ProfileActivity**](src/yoga1290/schoolmate/ProfileActivity.java) , starts after the Connect Activity and on profile picture click in the [view_class_stream](src/yoga1290/schoolmate/view_class_stream.java)
++	[ProfileActivity](src/yoga1290/schoolmate/ProfileActivity.java) , starts after the Connect Activity and on profile picture click in the [view_class_stream](src/yoga1290/schoolmate/view_class_stream.java)
 
-+	[**ClassActivity**](src/yoga1290/schoolmate/ClassActivity.java) , starts on button press in the **ProfileActivity**, having some Swipping-Views; [view_class_details](src/yoga1290/schoolmate/view_class_details.java) to show data about class with [current_class](src/yoga1290/schoolmate/view_class_details.java#L31) as an id, [view_class_stream](src/yoga1290/schoolmate/view_class_stream.java) view for displaying the received messages and social sharing.
++	[ClassActivity](src/yoga1290/schoolmate/ClassActivity.java) , starts on button press in the **ProfileActivity**, having some Swipping-Views; [view_class_details](src/yoga1290/schoolmate/view_class_details.java) to show data about class with [current_class](src/yoga1290/schoolmate/view_class_details.java#L31) as an id, [view_class_stream](src/yoga1290/schoolmate/view_class_stream.java) view for displaying the received messages and social sharing.
 
 # WebServer
 
