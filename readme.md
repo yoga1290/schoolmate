@@ -50,7 +50,7 @@ In-App Socket Server that handles couple of things:
 
 
 
-+	**Sociability (Audio/Messaging)**
++	**Sociability (Audio Streaming+Messaging)**
 
 ![Sociability](readme/readme2.png)
 
