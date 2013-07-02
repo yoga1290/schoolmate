@@ -44,7 +44,11 @@ In-App Socket Server that handles couple of things:
 ![Authorizing](readme/readme1.png)
 
 +	Later, the access token is used to establish a URLConnection to retrieve the users data (e.g: Facebook/Foursqaure ID)… but KEYS from their JSON responses may clash with others in the [Connect.json](src/yoga1290/schoolmate/Connect.java)… so, before storing any data, there will be URLConnection CallBack Handlers to avoid JSON Keys collision
+
+
 ![AvoidingKeyCollision](readme/URLConnectionThread.png)
+
+
 
 +	**Sociability (Audio/Messaging)**
 
