@@ -116,4 +116,4 @@ Example of requests/responses for getters & setters:
 I'm switching to Bluetooth Socket Server connection; more independent and w a fixed address.
 +	Bluetooth device discovery implemented in [ClassActivity](src/yoga1290/schoolmate/ClassActivity.java#L108)
 +	[BluetoothServer](src/yoga1290/schoolmate/Server.java#L686) as [Server](src/yoga1290/schoolmate/Server.java#L654)
-+	[BluetoothServerRequestHandler](src/yoga1290/schoolmate/Server.java#L811) instead of [ServerRequestHandler](src/yoga1290/schoolmate/Server.java#L470)
++	[BluetoothServerRequestHandler](src/yoga1290/schoolmate/Server.java#L811) as [ServerRequestHandler](src/yoga1290/schoolmate/Server.java#L470)
