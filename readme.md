@@ -1,8 +1,8 @@
 # Handling URLConnections vs UI-Thread
 
-URLConnections are carried on separate threads and UI updates are packed in a new thread that will be queued and "runOnUiThread":
+URLConnections are carried on separate threads and UI updates are packed in a new thread that will be queued and "runOnUiThread".
 
-+	[URLThread](src/yoga1290/schoolmate/URLThread.java) creates an in depended URLConnection thread , read string input and when it calls back to **URLCallBack(String response)** in a given class that implements the [interface URLThread_CallBack](src/yoga1290/schoolmate/URLThread.java#L18) 
+[URLThread](src/yoga1290/schoolmate/URLThread.java) creates an in depended URLConnection thread , read string input and when it calls back to **URLCallBack(String response)** in a given class that implements the [interface URLThread_CallBack](src/yoga1290/schoolmate/URLThread.java#L18) 
 
 
 
