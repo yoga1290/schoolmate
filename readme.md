@@ -109,7 +109,7 @@ Example of requests/responses for getters & setters:
 >		"students":"1,2,3,…"
 >	}
 >>	students: IDs of students in this class
->>	used for generating [charts](src/yoga1290/schoolmate/Charts.java) where (schedule) is a  6-element array representing the 6 daily periods, each integer is a binary mask in form of 0bSMTWtFs (Sunday,Monday,Tuesday,Wednesday,thursday,Friday & saturday in order)
+>>	used for generating [charts](src/yoga1290/schoolmate/Charts.java) where (schedule) is a  6-element array representing the 6 daily periods, each integer is a binary mask in form of **0bSMTWtFs** (Sunday,Monday,Tuesday,Wednesday,thursday,Friday & saturday in order)
 
 + POST /schoolmate/student?id=…&pin=…
 + POST /schoolmate/staff?id=…&pin=…
