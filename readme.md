@@ -34,7 +34,7 @@ URLConnections are carried on separate threads and UI updates are packed in a ne
 # [Connect](src/yoga1290/schoolmate/Connect.java)
 
 +	Locally stored file, used for storing user data for later use and transfer data between Activities
-+	Implementation: getData():JSONObject & setData(JSONObject):void in [Connect](src/yoga1290/schoolmate/Connect.java)
++	Implementation: **getData():JSONObject** & **setData(JSONObject):void** in [Connect](src/yoga1290/schoolmate/Connect.java)
 
 # [In-App Server](src/yoga1290/schoolmate/Server.java)
 
