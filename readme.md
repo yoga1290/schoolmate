@@ -5,6 +5,8 @@ URLConnections are carried on separate threads and UI updates are packed in a ne
 +	[URLThread](src/yoga1290/schoolmate/URLThread.java) creates an in depended URLConnection thread , read string input and when it calls back to **URLCallBack(String response)** in a given class that implements the [interface URLThread_CallBack](src/yoga1290/schoolmate/URLThread.java#L18) 
 
 
+
+
      final Activity currentActivity=this;
      new URLThread("URL HERE", new URLThread_CallBack() 
      { 
@@ -26,6 +28,8 @@ URLConnections are carried on separate threads and UI updates are packed in a ne
     		); 
     	}
     }, "Optional POST DATA HERE,otherwise GET is used").start();
+
+
 
 # [Connect](src/yoga1290/schoolmate/Connect.java)
 
