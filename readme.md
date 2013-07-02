@@ -1,4 +1,4 @@
-# URLConnections w UI-Thread
+# URLConnections in UI-Thread
 
 URLConnections are carried on separate threads and UI updates are packed in a new thread that will be queued and "runOnUiThread".
 
